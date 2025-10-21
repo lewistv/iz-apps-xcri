@@ -79,7 +79,7 @@ ssh web4ustfccca@web4.ustfccca.org "echo 'SSH OK'; whoami; hostname; pwd"
 ```bash
 # Test database connection from server
 ssh web4ustfccca@web4.ustfccca.org \
-  "mysql --user=web4ustfccca_public --password=39rDXrFP3e*f web4ustfccca_iz -e 'SELECT COUNT(*) FROM iz_rankings_xcri_athlete_rankings'"
+  "mysql --user=web4ustfccca_public --password=[REDACTED] web4ustfccca_iz -e 'SELECT COUNT(*) FROM iz_rankings_xcri_athlete_rankings'"
 
 # Expected: ~418,000 athletes
 ```
@@ -173,7 +173,7 @@ DATABASE_HOST=localhost
 DATABASE_PORT=3306
 DATABASE_NAME=web4ustfccca_iz
 DATABASE_USER=web4ustfccca_public
-DATABASE_PASSWORD=39rDXrFP3e*f
+DATABASE_PASSWORD=[REDACTED]
 
 API_HOST=127.0.0.1
 API_PORT=8001
@@ -795,7 +795,7 @@ curl http://127.0.0.1:8001/health
 
 ```bash
 # Test database credentials
-mysql --user=web4ustfccca_public --password=39rDXrFP3e*f web4ustfccca_iz -e "SELECT 1"
+mysql --user=web4ustfccca_public --password=[REDACTED] web4ustfccca_iz -e "SELECT 1"
 
 # Check .env file
 cat /home/web4ustfccca/iz/xcri/api/.env | grep DATABASE
