@@ -75,15 +75,8 @@ export default function Feedback() {
 
           <div className="feedback-success">
             <h2>✓ Thank You!</h2>
-            <p>Your feedback has been received and tracked.</p>
-
-            {issueUrl && (
-              <p className="issue-link">
-                <a href={issueUrl} target="_blank" rel="noopener noreferrer">
-                  View your submission on GitHub →
-                </a>
-              </p>
-            )}
+            <p>Your feedback has been received and our team will review it soon.</p>
+            <p>We appreciate you taking the time to help us improve XCRI!</p>
 
             <div className="success-actions">
               <button onClick={() => setSubmitted(false)} className="btn-primary">
