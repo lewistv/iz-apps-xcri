@@ -8,13 +8,13 @@ import logging
 from typing import Optional
 from fastapi import APIRouter, Query, HTTPException, status
 
-from webapp.api.models import (
+from models import (
     TeamListResponse,
     TeamRanking,
     ErrorResponse
 )
-from webapp.api.services import team_service
-from webapp.api.config import settings
+from services import team_service
+from config import settings
 
 logger = logging.getLogger(__name__)
 

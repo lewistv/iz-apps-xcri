@@ -16,9 +16,12 @@ This file provides guidance to Claude Code when working with the XCRI Rankings w
 
 **Migration Status**: ✅ COMPLETE - Migrated from izzypy_xcri/webapp
 **Git Status**: ✅ Initialized with initial commit
-**Deployment Status**: 🔜 READY FOR DEPLOYMENT (next session)
+**Deployment Status**: ✅ **DEPLOYED AND OPERATIONAL**
 
-**Next Steps**: Deploy to web4.ustfccca.org/iz/xcri
+**Production URL**: https://web4.ustfccca.org/iz/xcri/
+**API URL**: https://web4.ustfccca.org/iz/xcri/api/
+
+**Next Session**: Cosmetic and practical fixes
 
 ---
 
@@ -510,14 +513,106 @@ tail -50 /home/web4ustfccca/iz/xcri/logs/api-error.log
 - Phase 2: Migration to iz-apps-clean/xcri complete
 - Files: 69 files, 11,755 lines migrated
 - Git: Repository initialized with initial commit
-- Status: Ready for deployment (next session)
+- Status: Ready for deployment
 
-**Next Session** (to be performed):
-- Deploy to web4.ustfccca.org
-- Configure systemd service
-- Test production deployment
-- Validate all endpoints
-- Performance testing
+**Deployment Session 002** (October 21, 2025):
+- ✅ Frontend deployed to /iz/xcri/
+- ✅ Backend systemd service configured
+- ✅ CGI proxy created for API routing
+- ✅ Root .htaccess configured for SPA + API routing
+- ✅ Database module fixed (lazy initialization + Pydantic Settings)
+- ✅ All API endpoints validated (athletes, teams, snapshots, metadata)
+- ✅ Frontend loading and rendering athlete data
+- Status: **Deployed and operational**
+
+**Next Session**: Cosmetic and practical fixes
+
+---
+
+## Deployment Issues Resolved
+
+### Issue 1: CGI Proxy 500 Errors
+**Problem**: api-proxy.cgi worked via SSH but returned 500 errors via web browser
+
+**Root Cause**: Python stdout buffering - mixing text-mode `print()` with binary-mode `sys.stdout.buffer.write()` caused headers and body to appear out of order
+
+**Solution**: Added `flush=True` to all print statements and explicit `sys.stdout.flush()` before binary writes
+
+**Files Changed**: `/iz/xcri/api-proxy.cgi`
+
+### Issue 2: API Routing Missing Path
+**Problem**: API requests reached backend but with empty path (e.g., `/athletes/` became `/`)
+
+**Root Cause**: Root .htaccess rewrite rule missing `$1` to preserve path after `/api/`
+
+**Solution**: Changed rule from `RewriteRule ^iz/xcri/api(/.*)?$ /iz/xcri/api-proxy.cgi [QSA,L]` to `RewriteRule ^iz/xcri/api(/.*)?$ /iz/xcri/api-proxy.cgi$1 [QSA,L]`
+
+**Files Changed**: `/public_html/.htaccess` (root)
+
+### Issue 3: Service Startup Failure (DATABASE_PASSWORD)
+**Problem**: xcri-api service failed to start with "DATABASE_PASSWORD environment variable is required"
+
+**Root Cause**: database.py tried to initialize `DatabaseConfig()` at module import time, before .env file was loaded
+
+**Solution**:
+1. Changed from `os.getenv()` to Pydantic Settings (which loads .env automatically)
+2. Implemented lazy initialization - `db_config = None` at module level, initialized on first `get_db()` call
+3. DatabaseConfig now imports from config.py which handles .env loading
+
+**Files Changed**: `api/database.py`, `api/config.py`
+
+### Issue 4: Missing Config Fields
+**Problem**: Service failed with `AttributeError: 'Settings' object has no attribute 'api_title'`
+
+**Root Cause**: config.py was simplified too much, removing fields that main.py needed
+
+**Solution**: Added `api_title`, `api_description`, `api_version` fields to Settings class
+
+**Files Changed**: `api/config.py`
+
+### Issue 5: Zombie Uvicorn Processes
+**Problem**: Service showed "running" but served old/broken code with import errors
+
+**Root Cause**: Previous uvicorn process survived after crash, listening on port 8001
+
+**Diagnosis**: `ps aux | grep uvicorn` revealed old process from earlier deployment
+
+**Solution**: Killed zombie process with `kill -9 <PID>`, then restarted service
+
+**Prevention**: Always check for running processes before debugging startup failures
+
+### Issue 6: Python Bytecode Cache
+**Problem**: Code changes didn't take effect even after deployment
+
+**Root Cause**: `.pyc` files cached old code with import errors
+
+**Solution**: Clear all bytecode cache before service restart:
+```bash
+find /home/web4ustfccca/public_html/iz/xcri/api -name '*.pyc' -delete
+find /home/web4ustfccca/public_html/iz/xcri/api -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null
+```
+
+**Best Practice**: Include cache clearing in deployment workflow
+
+---
+
+## Verified Endpoints (October 21, 2025)
+
+| Endpoint | Status | Response Time | Notes |
+|----------|--------|---------------|-------|
+| `/health` | ✅ Working | <100ms | Database: 418K athletes, 36K teams, 60K SCS |
+| `/athletes/` | ✅ Working | <200ms | Filters: division, gender, region, conference |
+| `/athletes/{id}` | ✅ Working | <100ms | Individual athlete lookup |
+| `/athletes/team/{id}/roster` | ✅ Working | <150ms | Team roster with rankings |
+| `/teams/` | ✅ Working | <150ms | Team rankings with filters |
+| `/teams/{id}` | ✅ Working | <100ms | Individual team lookup |
+| `/snapshots/` | ✅ Working | <200ms | Lists 13 historical snapshots |
+| `/snapshots/{date}/athletes` | ✅ Working | <300ms | Historical athlete data from Excel |
+| `/snapshots/{date}/teams` | ✅ Working | <300ms | Historical team data from Excel |
+| `/metadata/` | ✅ Working | <100ms | Calculation metadata |
+| `/metadata/latest` | ✅ Working | <100ms | Latest 14 calculations |
+
+**Frontend**: ✅ Working - Loads athlete table with division/gender filters
 
 ---
 
@@ -531,5 +626,6 @@ For questions about this webapp or deployment issues, refer to:
 ---
 
 **Last Updated**: October 21, 2025
-**Migration Status**: Complete (ready for deployment)
-**Next Step**: Deploy to web4 server
+**Migration Status**: Complete and deployed
+**Deployment Status**: ✅ Operational
+**Next Step**: Cosmetic and practical fixes

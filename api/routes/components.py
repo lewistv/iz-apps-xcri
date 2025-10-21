@@ -8,13 +8,13 @@ import logging
 from typing import Optional
 from fastapi import APIRouter, Query, HTTPException, status, Path
 
-from webapp.api.models import (
+from models import (
     ComponentBreakdown,
     ComponentLeaderboardResponse,
     ErrorResponse
 )
-from webapp.api.services import components_service
-from webapp.api.config import settings
+from services import components_service
+from config import settings
 
 logger = logging.getLogger(__name__)
 

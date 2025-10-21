@@ -6,7 +6,7 @@ Business logic for retrieving historical snapshot data from MySQL database.
 
 import logging
 from typing import List, Dict, Tuple, Optional
-from webapp.api.database import get_db_cursor
+from database import get_db_cursor
 
 logger = logging.getLogger(__name__)
 

@@ -22,10 +22,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import JSONResponse
 
-from webapp.api.config import settings
-from webapp.api.database import validate_database_connection, get_table_counts
-from webapp.api.models import HealthCheckResponse, ErrorResponse
-from webapp.api.routes import athletes, teams, metadata, snapshots, scs, components
+from config import settings
+from database import validate_database_connection, get_table_counts
+from models import HealthCheckResponse, ErrorResponse
+from routes import athletes, teams, metadata, snapshots, scs, components
 
 # Configure logging
 logging.basicConfig(

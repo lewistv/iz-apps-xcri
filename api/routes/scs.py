@@ -7,8 +7,8 @@ REST endpoints for accessing SCS component breakdowns.
 from fastapi import APIRouter, Query, HTTPException
 from typing import Optional
 
-from webapp.api.services import scs_service
-from webapp.api.models import (
+from services import scs_service
+from models import (
     SCSComponents,
     SCSComponentLeaderboard,
     SCSComponentComparison,

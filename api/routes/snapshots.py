@@ -9,9 +9,9 @@ import logging
 from typing import Optional
 from fastapi import APIRouter, Query, HTTPException, status
 
-from webapp.api.models import ErrorResponse
-from webapp.api.services.snapshot_service import snapshot_service
-from webapp.api.config import settings
+from models import ErrorResponse
+from services.snapshot_service import snapshot_service
+from config import settings
 
 logger = logging.getLogger(__name__)
 

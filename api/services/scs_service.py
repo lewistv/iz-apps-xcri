@@ -7,7 +7,7 @@ Business logic for querying SCS component breakdowns from database.
 import logging
 from typing import Optional, Dict, Any
 
-from webapp.api.database import get_db_cursor
+from database import get_db_cursor
 
 logger = logging.getLogger(__name__)
 

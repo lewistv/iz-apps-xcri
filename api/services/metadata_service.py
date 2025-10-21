@@ -7,7 +7,7 @@ Business logic for querying calculation metadata from database.
 import logging
 from typing import Optional, List, Dict, Any
 
-from webapp.api.database import get_db_cursor
+from database import get_db_cursor
 
 logger = logging.getLogger(__name__)
 

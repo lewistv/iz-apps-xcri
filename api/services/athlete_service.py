@@ -7,7 +7,7 @@ Business logic for querying athlete rankings from database.
 import logging
 from typing import Optional, Tuple, List, Dict, Any
 
-from webapp.api.database import get_db_cursor, build_where_clause
+from database import get_db_cursor, build_where_clause
 
 logger = logging.getLogger(__name__)
 

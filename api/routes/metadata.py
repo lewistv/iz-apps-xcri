@@ -8,12 +8,12 @@ import logging
 from typing import Optional
 from fastapi import APIRouter, Query, HTTPException, status
 
-from webapp.api.models import (
+from models import (
     MetadataListResponse,
     CalculationMetadata,
     ErrorResponse
 )
-from webapp.api.services import metadata_service
+from services import metadata_service
 
 logger = logging.getLogger(__name__)
 
