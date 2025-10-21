@@ -56,29 +56,37 @@ export default function SearchBar({
 
   return (
     <div className="search-bar">
-      <input
-        type="text"
-        value={inputValue}
-        onChange={handleChange}
-        placeholder={placeholder}
-        className="search-input"
-        disabled={loading}
-      />
-      {showCharCount && (
-        <span className="search-hint" title="Type at least 3 letters to search">
-          {charCount}/3
-        </span>
-      )}
-      {loading && (
-        <span className="search-loading-indicator" title="Searching...">
-          ⏳
-        </span>
-      )}
-      {inputValue && !loading && (
-        <button type="button" onClick={handleClear} className="clear-button">
-          Clear
-        </button>
-      )}
+      <div className="search-input-container">
+        <input
+          type="text"
+          value={inputValue}
+          onChange={handleChange}
+          placeholder={placeholder}
+          className="search-input"
+          disabled={loading}
+        />
+        {showCharCount && (
+          <span className="search-hint" title="Type at least 3 letters to search">
+            {charCount}/3
+          </span>
+        )}
+        {loading && (
+          <span className="search-loading-indicator" title="Searching...">
+            ⏳
+          </span>
+        )}
+        {inputValue && !loading && (
+          <button
+            type="button"
+            onClick={handleClear}
+            className="search-clear-button"
+            title="Clear search"
+            aria-label="Clear search"
+          >
+            ✕
+          </button>
+        )}
+      </div>
     </div>
   );
 }

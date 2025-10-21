@@ -471,21 +471,31 @@ function MainRankingsView() {
 
       {/* Content */}
       <main className="content">
+        {/* Result Count */}
+        {!loading && !error && data.results && data.results.length > 0 && (
+          <div className="results-summary">
+            Showing {data.results.length} of {data.total.toLocaleString()} {view}
+            {search && ` matching "${search}"`}
+            {region && ` in ${region}`}
+            {conference && ` in ${conference}`}
+          </div>
+        )}
+
         {/* Loading State */}
         {loading && (
-          <div className="loading-message">
-            <div className="spinner"></div>
-            <p>Loading data...</p>
+          <div className="loading-container">
+            <div className="loading-spinner"></div>
+            <p>Loading {view === 'athletes' ? 'athletes' : 'teams'}...</p>
           </div>
         )}
 
         {/* Error State */}
         {error && !loading && (
           <div className="error-message">
-            <h3>Error</h3>
+            <h3>Unable to Load Data</h3>
             <p>{error}</p>
             <button onClick={isHistorical ? fetchHistoricalData : fetchCurrentData} className="retry-button">
-              Retry
+              Try Again
             </button>
           </div>
         )}
@@ -569,9 +579,11 @@ function MainRankingsView() {
 
         {/* No Results */}
         {!loading && !error && data.results && data.results.length === 0 && (
-          <div className="empty-message">
-            <p>No {view} found matching your criteria.</p>
+          <div className="no-results">
+            <h3>No Results Found</h3>
+            <p>No {view} found matching your current filters.</p>
             {search && <p>Try adjusting your search term.</p>}
+            {(region || conference) && <p>Try selecting "All Regions" or "All Conferences".</p>}
           </div>
         )}
       </main>
