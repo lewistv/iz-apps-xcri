@@ -1,17 +1,23 @@
-# XCRI Rankings Apache Configuration
-# React SPA + FastAPI Backend
+# XCRI Rankings Application - Apache Configuration
+# React SPA with API proxy routing
+
+DirectoryIndex index.html
 
 RewriteEngine On
-RewriteBase /iz/xcri/
 
-# API Reverse Proxy - Forward API requests to FastAPI daemon on port 8001
-RewriteCond %{REQUEST_URI} ^/iz/xcri/api/
-RewriteRule ^api/(.*)$ http://127.0.0.1:8001/$1 [P,L]
+# Route API requests to CGI proxy
+RewriteRule ^api/(.*)$ api-proxy.cgi/$1 [QSA,L]
 
-# SPA Routing - Serve index.html for all non-file requests (React Router support)
+# Allow CGI execution for API proxy
+<Files "api-proxy.cgi">
+    Options +ExecCGI
+    AddHandler cgi-script .cgi
+    Require all granted
+</Files>
+
+# SPA fallback - serve index.html for all other non-file requests
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
-RewriteCond %{REQUEST_URI} !^/iz/xcri/api/
 RewriteRule ^ index.html [L]
 
 # Security Headers
