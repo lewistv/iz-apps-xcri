@@ -23,7 +23,7 @@ export default function Header() {
                   <img
                     width="80"
                     height="75"
-                    src="/ustfccca-main-blue.png"
+                    src="/iz/shared/static/images/ustfccca-main-blue.png"
                     className="ustfccca-logo"
                     alt="USTFCCCA"
                     decoding="async"
