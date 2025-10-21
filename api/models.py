@@ -622,27 +622,32 @@ class ComponentLeaderboardResponse(BaseModel):
 
 
 # Session 004: Season Resume Models (Issue #15)
+from datetime import datetime as dt
+
 class SeasonResume(BaseModel):
     """Season resume for a team"""
-    group_resume_id: int = Field(description="Resume record ID")
+    id: int = Field(description="Resume record ID")
     season_year: int = Field(description="Season year")
-    anet_group_hnd: int = Field(description="AthleticNet group handle (team ID)")
-    division_code: int = Field(description="Division code")
-    gender_code: str = Field(description="Gender code (M or F)")
-    resume_html: str = Field(description="Season resume HTML content")
-    created_at: Optional[str] = Field(default=None, description="Creation timestamp")
-    updated_at: Optional[str] = Field(default=None, description="Last update timestamp")
+    group_fk: int = Field(description="USTFCCCA group ID")
+    gender_fk: int = Field(description="Gender foreign key (1=M, 2=F)")
+    sport_fk: int = Field(description="Sport foreign key (3=Cross Country)")
+    season_html: str = Field(description="Season resume HTML content")
+    created_at: Optional[dt] = Field(default=None, description="Creation timestamp")
+    updated_at: Optional[dt] = Field(default=None, description="Last update timestamp")
 
     class Config:
         from_attributes = True
+        json_encoders = {
+            dt: lambda v: v.isoformat() if v else None
+        }
         json_schema_extra = {
             "example": {
-                "group_resume_id": 1234,
+                "id": 1234,
                 "season_year": 2025,
-                "anet_group_hnd": 567890,
-                "division_code": 2030,
-                "gender_code": "M",
-                "resume_html": "<div class='season-resume'>...</div>",
+                "group_fk": 567,
+                "gender_fk": 1,
+                "sport_fk": 3,
+                "season_html": "<div class='season-resume'>...</div>",
                 "created_at": "2025-10-15T12:00:00",
                 "updated_at": "2025-10-20T15:30:00"
             }

@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 
 def get_team_resume(
-    anet_group_hnd: int,
+    anet_team_hnd: int,
     season_year: int = 2025,
     division_code: Optional[int] = None,
     gender_code: Optional[str] = None
@@ -23,55 +23,59 @@ def get_team_resume(
     Get season resume for a specific team.
 
     Args:
-        anet_group_hnd: AthleticNet group handle (team ID)
+        anet_team_hnd: AthleticNet team handle (IDSchool in iz_athnet_teams)
         season_year: Season year (default: 2025)
-        division_code: Division code (optional, e.g., 2030 for D1)
+        division_code: Division code (optional, currently not used in query)
         gender_code: Gender code M/F (optional)
 
     Returns:
         Resume record dictionary or None if not found
         {
-            'group_resume_id': int,
+            'id': int,
             'season_year': int,
-            'anet_group_hnd': int,
-            'division_code': int,
-            'gender_code': str,
-            'resume_html': str,
+            'group_fk': int,
+            'gender_fk': int,
+            'sport_fk': int,
+            'season_html': str,
             'created_at': datetime,
             'updated_at': datetime
         }
     """
     with get_db_cursor() as cursor:
         # Build WHERE clause
-        where_clauses = [
-            "anet_group_hnd = %s",
-            "season_year = %s"
-        ]
-        params = [anet_group_hnd, season_year]
-
-        if division_code is not None:
-            where_clauses.append("division_code = %s")
-            params.append(division_code)
-
+        # Map gender code (M/F) to gender_fk (1/2)
+        gender_fk = None
         if gender_code:
-            where_clauses.append("gender_code = %s")
-            params.append(gender_code)
+            gender_fk = 1 if gender_code.upper() == 'M' else 2
+
+        where_clauses = [
+            "t.IDSchool = %s",
+            "r.season_year = %s",
+            "r.sport_fk = 3"  # 3 = Cross Country
+        ]
+        params = [anet_team_hnd, season_year]
+
+        if gender_fk is not None:
+            where_clauses.append("r.gender_fk = %s")
+            params.append(gender_fk)
 
         where_sql = " AND ".join(where_clauses)
 
+        # Join through iz_athnet_teams to map anet_team_hnd to group_fk
         query_sql = f"""
             SELECT
-                group_resume_id,
-                season_year,
-                anet_group_hnd,
-                division_code,
-                gender_code,
-                resume_html,
-                created_at,
-                updated_at
-            FROM iz_groups_season_resumes
+                r.id,
+                r.season_year,
+                r.group_fk,
+                r.gender_fk,
+                r.sport_fk,
+                r.season_html,
+                r.created_at,
+                r.updated_at
+            FROM iz_groups_season_resumes r
+            JOIN iz_athnet_teams t ON r.group_fk = t.UstfcccaId
             WHERE {where_sql}
-            ORDER BY updated_at DESC
+            ORDER BY r.updated_at DESC
             LIMIT 1
         """
         cursor.execute(query_sql, params)
@@ -79,13 +83,13 @@ def get_team_resume(
 
         if result:
             logger.info(
-                f"Resume found: group_hnd={anet_group_hnd}, "
-                f"season={season_year}, division={division_code}, gender={gender_code}"
+                f"Resume found: anet_team_hnd={anet_team_hnd}, "
+                f"season={season_year}, gender_code={gender_code}"
             )
         else:
             logger.info(
-                f"Resume not found: group_hnd={anet_group_hnd}, "
-                f"season={season_year}, division={division_code}, gender={gender_code}"
+                f"Resume not found: anet_team_hnd={anet_team_hnd}, "
+                f"season={season_year}, gender_code={gender_code}"
             )
 
         return result

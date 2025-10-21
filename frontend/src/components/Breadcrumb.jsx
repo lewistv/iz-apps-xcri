@@ -37,7 +37,7 @@ export default function Breadcrumb() {
           >
             <span className="anet-attribution-text">Data provided by</span>
             <img
-              src="https://www.athletic.net/images/Logo/A-with-yellow-Athletic-224px.png"
+              src="https://www.ustfccca.org/images/athleticnet.svg"
               alt="Athletic.net"
               className="anet-logo"
             />

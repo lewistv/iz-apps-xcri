@@ -239,7 +239,7 @@ async def get_team_resume(
     """Get season resume for a team"""
     try:
         result = resume_service.get_team_resume(
-            anet_group_hnd=team_hnd,
+            anet_team_hnd=team_hnd,
             season_year=season_year,
             division_code=division,
             gender_code=gender

@@ -494,7 +494,7 @@ export default function TeamProfile() {
               {/* Render HTML from trusted database source */}
               <div
                 className="season-resume-content"
-                dangerouslySetInnerHTML={{ __html: seasonResume.resume_html }}
+                dangerouslySetInnerHTML={{ __html: seasonResume.season_html }}
               />
               <div className="resume-metadata">
                 <small>
