@@ -619,3 +619,31 @@ class ComponentLeaderboardResponse(BaseModel):
                 ]
             }
         }
+
+
+# Session 004: Season Resume Models (Issue #15)
+class SeasonResume(BaseModel):
+    """Season resume for a team"""
+    group_resume_id: int = Field(description="Resume record ID")
+    season_year: int = Field(description="Season year")
+    anet_group_hnd: int = Field(description="AthleticNet group handle (team ID)")
+    division_code: int = Field(description="Division code")
+    gender_code: str = Field(description="Gender code (M or F)")
+    resume_html: str = Field(description="Season resume HTML content")
+    created_at: Optional[str] = Field(default=None, description="Creation timestamp")
+    updated_at: Optional[str] = Field(default=None, description="Last update timestamp")
+
+    class Config:
+        from_attributes = True
+        json_schema_extra = {
+            "example": {
+                "group_resume_id": 1234,
+                "season_year": 2025,
+                "anet_group_hnd": 567890,
+                "division_code": 2030,
+                "gender_code": "M",
+                "resume_html": "<div class='season-resume'>...</div>",
+                "created_at": "2025-10-15T12:00:00",
+                "updated_at": "2025-10-20T15:30:00"
+            }
+        }

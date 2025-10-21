@@ -67,6 +67,14 @@ export const teamsAPI = {
    * @returns {Promise} API response with team details
    */
   get: (teamId, params) => api.get(`/teams/${teamId}`, { params }),
+
+  /**
+   * Get season resume for a team (Session 004: Issue #15)
+   * @param {number} teamId - AthleticNet team handle
+   * @param {Object} params - Query parameters (season_year, division, gender)
+   * @returns {Promise} API response with resume HTML
+   */
+  resume: (teamId, params) => api.get(`/teams/${teamId}/resume`, { params }),
 };
 
 // Metadata API endpoints

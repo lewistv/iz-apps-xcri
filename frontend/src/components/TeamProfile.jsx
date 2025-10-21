@@ -17,8 +17,10 @@ export default function TeamProfile() {
   const [teamData, setTeamData] = useState(null);
   const [roster, setRoster] = useState([]);
   const [historicalRankings, setHistoricalRankings] = useState([]);
+  const [seasonResume, setSeasonResume] = useState(null);
   const [loading, setLoading] = useState(true);
   const [loadingHistory, setLoadingHistory] = useState(false);
+  const [loadingResume, setLoadingResume] = useState(false);
   const [error, setError] = useState(null);
 
   useEffect(() => {
@@ -187,6 +189,39 @@ export default function TeamProfile() {
     };
 
     fetchHistoricalRankings();
+  }, [teamData, teamId, snapshot]);
+
+  // Fetch season resume (Session 004: Issue #15)
+  useEffect(() => {
+    const fetchSeasonResume = async () => {
+      // Only fetch for current rankings (not snapshots)
+      if (!teamData || snapshot) {
+        return;
+      }
+
+      try {
+        setLoadingResume(true);
+
+        const resumeResponse = await teamsAPI.resume(teamId, {
+          season_year: teamData.season_year,
+          division: teamData.division_code,
+          gender: teamData.gender_code
+        });
+
+        if (resumeResponse && resumeResponse.data) {
+          setSeasonResume(resumeResponse.data);
+        }
+      } catch (err) {
+        // Resume not found is not an error - it's optional data
+        if (err.response && err.response.status !== 404) {
+          console.error('Error fetching season resume:', err);
+        }
+      } finally {
+        setLoadingResume(false);
+      }
+    };
+
+    fetchSeasonResume();
   }, [teamData, teamId, snapshot]);
 
   // Get division name from code
@@ -438,6 +473,38 @@ export default function TeamProfile() {
                   ))}
                 </tbody>
               </table>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Season Resume Section (Session 004: Issue #15) */}
+      {!snapshot && (
+        <div className="season-resume-section">
+          <h3>Season Resume</h3>
+
+          {loadingResume ? (
+            <div className="loading-message">Loading season resume...</div>
+          ) : !seasonResume ? (
+            <div className="stub-message">
+              <p>No season resume data available for this team.</p>
+            </div>
+          ) : (
+            <div className="season-resume-container">
+              {/* Render HTML from trusted database source */}
+              <div
+                className="season-resume-content"
+                dangerouslySetInnerHTML={{ __html: seasonResume.resume_html }}
+              />
+              <div className="resume-metadata">
+                <small>
+                  Last updated: {new Date(seasonResume.updated_at).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                  })}
+                </small>
+              </div>
             </div>
           )}
         </div>

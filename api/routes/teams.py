@@ -11,9 +11,10 @@ from fastapi import APIRouter, Query, HTTPException, status
 from models import (
     TeamListResponse,
     TeamRanking,
+    SeasonResume,
     ErrorResponse
 )
-from services import team_service
+from services import team_service, resume_service
 from config import settings
 
 logger = logging.getLogger(__name__)
@@ -199,4 +200,64 @@ async def get_team(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to retrieve team: {str(e)}"
+        )
+
+
+# Session 004: Season Resume Endpoint (Issue #15)
+@router.get(
+    "/{team_hnd}/resume",
+    response_model=SeasonResume,
+    summary="Get team season resume",
+    description="""
+    Get season resume HTML for a specific team.
+
+    The resume contains performance history and meet results for the season.
+
+    **Example:**
+    ```
+    GET /teams/123/resume?season_year=2025&division=2030&gender=M
+    ```
+    """,
+    responses={
+        404: {"model": ErrorResponse, "description": "Resume not found for this team"},
+        500: {"model": ErrorResponse, "description": "Internal server error"}
+    }
+)
+async def get_team_resume(
+    team_hnd: int,
+    season_year: int = Query(default=2025, description="Season year"),
+    division: Optional[int] = Query(
+        default=None,
+        description="Division code (2030=D1, 2031=D2, etc.)"
+    ),
+    gender: Optional[str] = Query(
+        default=None,
+        description="Gender code (M or F)",
+        pattern="^[MFmf]$"
+    )
+):
+    """Get season resume for a team"""
+    try:
+        result = resume_service.get_team_resume(
+            anet_group_hnd=team_hnd,
+            season_year=season_year,
+            division_code=division,
+            gender_code=gender
+        )
+
+        if not result:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Season resume not found for team {team_hnd} (season={season_year}, division={division}, gender={gender})"
+            )
+
+        return result
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error getting resume for team {team_hnd}: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to retrieve team resume: {str(e)}"
         )
