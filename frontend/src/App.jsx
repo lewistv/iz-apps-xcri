@@ -408,6 +408,13 @@ function MainRankingsView() {
       {/* Breadcrumb Navigation */}
       <Breadcrumb />
 
+      {/* Page Title */}
+      <div className="page-title-section">
+        <h1 className="page-title">
+          <span className="icon">🏆</span> XCRI: Cross Country Rating Index
+        </h1>
+      </div>
+
       {/* Page Subtitle */}
       <div className="page-subtitle">
         <p>
