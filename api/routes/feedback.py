@@ -6,9 +6,10 @@ from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel, Field
 from typing import Literal, Optional
 import httpx
-import os
 from datetime import datetime, timedelta
 from collections import defaultdict
+
+from config import settings
 
 router = APIRouter(prefix="/feedback", tags=["feedback"])
 
@@ -63,9 +64,9 @@ async def create_github_issue(feedback: FeedbackSubmission) -> dict:
     Create a GitHub issue from feedback submission
     Returns the created issue data
     """
-    # Get GitHub credentials from environment
-    github_token = os.getenv("GITHUB_TOKEN")
-    github_repo = os.getenv("GITHUB_REPO", "lewistv/iz-apps-xcri")
+    # Get GitHub credentials from settings
+    github_token = settings.github_token
+    github_repo = settings.github_repo
 
     if not github_token:
         raise HTTPException(
@@ -177,12 +178,9 @@ async def get_feedback_status():
     """
     Get feedback system status (for testing)
     """
-    github_token = os.getenv("GITHUB_TOKEN")
-    github_repo = os.getenv("GITHUB_REPO", "lewistv/iz-apps-xcri")
-
     return {
-        "configured": bool(github_token),
-        "repository": github_repo,
+        "configured": bool(settings.github_token),
+        "repository": settings.github_repo,
         "rate_limits": {
             "per_hour": MAX_SUBMISSIONS_PER_HOUR,
             "per_day": MAX_SUBMISSIONS_PER_DAY

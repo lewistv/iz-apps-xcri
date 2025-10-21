@@ -5,7 +5,7 @@ Loads configuration from environment variables or .env file.
 """
 
 import os
-from typing import List
+from typing import List, Optional
 from pydantic_settings import BaseSettings
 from pydantic import Field
 
@@ -61,6 +61,13 @@ class Settings(BaseSettings):
     default_season_year: int = Field(default=2025, description="Default season year")
     default_limit: int = Field(default=100, description="Default pagination limit")
     max_limit: int = Field(default=50000, description="Maximum pagination limit")
+
+    # ===================================================================
+    # GitHub Integration (for feedback form)
+    # ===================================================================
+
+    github_token: Optional[str] = Field(default=None, description="GitHub Personal Access Token")
+    github_repo: str = Field(default="lewistv/iz-apps-xcri", description="GitHub repository (owner/repo)")
 
     @property
     def cors_origins_list(self) -> List[str]:
