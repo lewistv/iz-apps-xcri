@@ -1,0 +1,18 @@
+[Unit]
+Description=XCRI Rankings API Service
+After=network.target
+
+[Service]
+Type=simple
+User=web4ustfccca
+WorkingDirectory=/home/web4ustfccca/iz/xcri/api
+Environment="PATH=/home/web4ustfccca/iz/xcri/api/venv/bin:/usr/local/bin:/usr/bin"
+ExecStart=/home/web4ustfccca/iz/xcri/api/venv/bin/uvicorn main:app --host 127.0.0.1 --port 8001 --workers 2
+Restart=always
+RestartSec=10
+
+StandardOutput=append:/home/web4ustfccca/iz/xcri/logs/api-access.log
+StandardError=append:/home/web4ustfccca/iz/xcri/logs/api-error.log
+
+[Install]
+WantedBy=default.target

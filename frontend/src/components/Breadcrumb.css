@@ -1,0 +1,67 @@
+/**
+ * Breadcrumb Navigation Styles
+ * Session 009C: Created for improved page hierarchy
+ */
+
+.breadcrumb {
+  background-color: #f9f9f9;
+  border-bottom: 1px solid #e0e0e0;
+  padding: 0.75rem 0;
+}
+
+.breadcrumb-list {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.breadcrumb-item {
+  display: flex;
+  align-items: center;
+}
+
+.breadcrumb-link {
+  color: #666;
+  font-size: 0.875rem;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.breadcrumb-link:hover {
+  color: var(--ustfccca-navy);
+}
+
+.breadcrumb-separator {
+  color: #999;
+  font-size: 0.875rem;
+  user-select: none;
+}
+
+.breadcrumb-current .breadcrumb-text {
+  color: var(--ustfccca-navy);
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .breadcrumb {
+    padding: 0.5rem 0;
+  }
+
+  .breadcrumb-list {
+    padding: 0 15px;
+    gap: 0.375rem;
+  }
+
+  .breadcrumb-link,
+  .breadcrumb-text,
+  .breadcrumb-separator {
+    font-size: 0.8rem;
+  }
+}

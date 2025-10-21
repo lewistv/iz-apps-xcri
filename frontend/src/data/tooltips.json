@@ -1,0 +1,213 @@
+{
+  "tooltips": {
+    "athlete_rankings": {
+      "xcri_rank": {
+        "text": "Overall competitive ranking based on head-to-head race results. Lower rank = better athlete.",
+        "placement": "top",
+        "trigger": "hover"
+      },
+      "xcri_score": {
+        "text": "Simple scoring metric (1000 minus rank). Athletes ranked higher score higher.",
+        "placement": "top",
+        "trigger": "hover"
+      },
+      "scs_score": {
+        "text": "Season Composite Score - balances athlete performance, performance relative to race field, and race strength. Click for detailed breakdown.",
+        "placement": "top",
+        "trigger": "hover",
+        "interactive": true,
+        "click_action": "open_scs_modal"
+      },
+      "scs_rank": {
+        "text": "Ranking based on SCS (Season Composite Score). May differ from XCRI Rank for tactical racers who win despite slower times.",
+        "placement": "top",
+        "trigger": "hover"
+      },
+      "races": {
+        "text": "Number of qualifying races completed this season. More races = more reliable ranking.",
+        "placement": "top",
+        "trigger": "hover"
+      },
+      "season_average": {
+        "text": "Average race performance (time per kilometer, course-adjusted). Worst race excluded if 3+ races.",
+        "placement": "top",
+        "trigger": "hover"
+      },
+      "h2h_record": {
+        "text": "Head-to-head win-loss record against other ranked athletes. Format: Wins-Losses (Win Rate %).",
+        "placement": "top",
+        "trigger": "hover"
+      },
+      "best_win": {
+        "text": "Rank of the highest-ranked athlete this athlete has defeated in direct competition.",
+        "placement": "top",
+        "trigger": "hover"
+      },
+      "quality_of_wins": {
+        "text": "Best opponent quality among athletes defeated (based on adjusted time per km). Faster pace = stronger competition.",
+        "placement": "top",
+        "trigger": "hover"
+      },
+      "saga_score": {
+        "text": "Season Adjusted Gap Average - measures gap-closing consistency. Higher scores indicate smaller gaps to top finishers. Higher is better.",
+        "placement": "top",
+        "trigger": "hover"
+      },
+      "saga_rank": {
+        "text": "Your ranking based on SAGA score. Rank #1 = highest SAGA score (best gap performance).",
+        "placement": "top",
+        "trigger": "hover"
+      },
+      "sewr_score": {
+        "text": "Season Equal-Weight Rating - overall season performance quality. Higher scores indicate better consistent performance. Higher is better.",
+        "placement": "top",
+        "trigger": "hover"
+      },
+      "sewr_rank": {
+        "text": "Your ranking based on SEWR score. Rank #1 = highest SEWR score (best season quality).",
+        "placement": "top",
+        "trigger": "hover"
+      },
+      "osma_score": {
+        "text": "Opponent SEWR Moving Average - measures strength of schedule. Higher scores indicate tougher competition faced. Higher is better.",
+        "placement": "top",
+        "trigger": "hover"
+      },
+      "osma_rank": {
+        "text": "Your ranking based on OSMA score. Rank #1 = highest OSMA score (toughest schedule faced).",
+        "placement": "top",
+        "trigger": "hover"
+      }
+    },
+    "team_rankings": {
+      "team_rank": {
+        "text": "Overall team ranking based on sum of top 7 athletes' individual XCRI ranks.",
+        "placement": "top",
+        "trigger": "hover"
+      },
+      "team_score": {
+        "text": "Sum of top 7 athletes' XCRI ranks. Lower score is better (e.g., ranks 1+5+10+15+20+25+30 = 106).",
+        "placement": "top",
+        "trigger": "hover"
+      },
+      "avg_rank": {
+        "text": "Average XCRI rank of top 7 athletes. Provides context for team quality.",
+        "placement": "top",
+        "trigger": "hover"
+      },
+      "regional_rank": {
+        "text": "Team's position within their NCAA geographic region (e.g., '2nd in Great Lakes Region').",
+        "placement": "top",
+        "trigger": "hover"
+      },
+      "conference_rank": {
+        "text": "Team's position within their athletic conference (e.g., '1st in Big Ten').",
+        "placement": "top",
+        "trigger": "hover"
+      },
+      "top_runner": {
+        "text": "Team's #1 ranked athlete and their individual XCRI rank.",
+        "placement": "top",
+        "trigger": "hover"
+      },
+      "runner_7": {
+        "text": "Team's 7th-best athlete and their individual XCRI rank. Indicates team depth.",
+        "placement": "top",
+        "trigger": "hover"
+      }
+    },
+    "filters": {
+      "division": {
+        "text": "Select which NCAA division to view (D1, D2, D3, NAIA, NJCAA D1, NJCAA D2, NJCAA D3).",
+        "placement": "bottom",
+        "trigger": "focus"
+      },
+      "gender": {
+        "text": "Choose Men's or Women's rankings.",
+        "placement": "bottom",
+        "trigger": "focus"
+      },
+      "region": {
+        "text": "Filter teams by NCAA geographic region. Helps compare regional competition.",
+        "placement": "bottom",
+        "trigger": "focus"
+      },
+      "conference": {
+        "text": "Filter teams by athletic conference (e.g., Big Ten, SEC).",
+        "placement": "bottom",
+        "trigger": "focus"
+      },
+      "checkpoint_date": {
+        "text": "View rankings from a specific week during the season. Shows ranking evolution over time.",
+        "placement": "bottom",
+        "trigger": "focus"
+      },
+      "search": {
+        "text": "Search for athletes by name or school. Type at least 3 characters.",
+        "placement": "right",
+        "trigger": "focus"
+      }
+    },
+    "interactive_elements": {
+      "scs_score_link": {
+        "text": "Click to view detailed SCS component breakdown (AGS, SAGA, CPR, SEWR, OSMA, XCRI).",
+        "placement": "top",
+        "trigger": "hover"
+      },
+      "athlete_name_link": {
+        "text": "Click to view athlete's full profile, including race history and detailed statistics.",
+        "placement": "top",
+        "trigger": "hover"
+      },
+      "team_name_link": {
+        "text": "Click to view team roster and all athletes from this school.",
+        "placement": "top",
+        "trigger": "hover"
+      },
+      "refresh_button": {
+        "text": "Reload rankings from database. Rankings update weekly after new race results.",
+        "placement": "top",
+        "trigger": "hover"
+      },
+      "export_button": {
+        "text": "Download current rankings as Excel file (.xlsx) or CSV for your own analysis.",
+        "placement": "top",
+        "trigger": "hover"
+      }
+    },
+    "algorithm_info": {
+      "knockout_algorithm": {
+        "text": "Rankings based on Knockout Algorithm - uses head-to-head race results and pairwise comparisons.",
+        "placement": "top",
+        "trigger": "hover"
+      },
+      "scs_info": {
+        "text": "SCS (Season Composite Score) - statistical metric based on 17-step calculation. Used as tiebreaker.",
+        "placement": "top",
+        "trigger": "hover"
+      },
+      "tiebreaker_hierarchy": {
+        "text": "Tiebreaking order: 1) Most Recent Common Race, 2) Common Opponents, 3) Quality of Wins, 4) SCS",
+        "placement": "top",
+        "trigger": "hover"
+      }
+    },
+    "help_links": {
+      "faq_link": {
+        "text": "View frequently asked questions about XCRI rankings and how they're calculated.",
+        "placement": "top",
+        "trigger": "hover"
+      },
+      "how_it_works": {
+        "text": "Learn how the Knockout Algorithm builds rankings using head-to-head comparisons.",
+        "placement": "top",
+        "trigger": "hover"
+      },
+      "glossary": {
+        "text": "View definitions of technical terms used in the XCRI system.",
+        "placement": "top",
+        "trigger": "hover"
+      }
+    }
+  }
+}

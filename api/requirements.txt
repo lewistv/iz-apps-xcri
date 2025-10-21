@@ -1,0 +1,18 @@
+# FastAPI Backend API Requirements
+# Session 034 - Web Application Backend
+
+# Core framework
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+
+# Configuration and environment
+python-dotenv==1.0.0
+pydantic==2.5.0
+pydantic-settings==2.1.0
+
+# Data processing (for snapshot Excel files)
+pandas>=2.1.0
+openpyxl>=3.1.0
+
+# Note: Database drivers (pymysql) are already in main requirements.txt
+# Import database connection from algorithms/shared/database_connection.py

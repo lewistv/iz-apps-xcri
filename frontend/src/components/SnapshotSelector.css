@@ -1,0 +1,309 @@
+/**
+ * Snapshot Selector Component Styles
+ *
+ * Provides styling for the historical snapshot navigation interface.
+ * Responsive design with mobile and desktop layouts.
+ */
+
+.snapshot-selector {
+  background: #f5f5f5;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  border: 1px solid #e0e0e0;
+}
+
+/* View Toggle (Radio Buttons) */
+.snapshot-selector .view-toggle {
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.snapshot-selector .view-toggle label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  font-weight: 500;
+  background-color: #e8e8e8 !important; /* Light gray background for non-active state */
+  border: 1px solid #ccc;
+  color: #333 !important; /* Dark gray text */
+}
+
+.snapshot-selector .view-toggle label span {
+  color: #333 !important; /* Dark gray text for span */
+}
+
+.snapshot-selector .view-toggle label:hover {
+  background-color: #d0d0d0 !important;
+  border-color: #003366;
+}
+
+.snapshot-selector .view-toggle label.active {
+  background-color: #003366 !important;
+  color: white !important;
+  border-color: #003366;
+}
+
+.snapshot-selector .view-toggle label.active span {
+  color: white !important; /* White text for active state */
+}
+
+.snapshot-selector .view-toggle input[type='radio'] {
+  cursor: pointer;
+  width: 18px;
+  height: 18px;
+}
+
+/* Snapshot Controls Container */
+.snapshot-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* Year Selector */
+.year-selector {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+}
+
+.year-selector label {
+  font-weight: 600;
+  color: #333;
+  white-space: nowrap;
+}
+
+.year-buttons {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.year-button {
+  padding: 0.6rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border: 2px solid #ccc;
+  border-radius: 6px;
+  background-color: white;
+  color: #333;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 80px;
+}
+
+.year-button:hover:not(:disabled) {
+  background-color: #e8e8e8;
+  border-color: #003366;
+}
+
+.year-button.active {
+  background-color: #003366;
+  color: white;
+  border-color: #003366;
+}
+
+.year-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Date Selector Dropdown */
+.date-selector {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+}
+
+.date-selector label {
+  font-weight: 600;
+  color: #333;
+  white-space: nowrap;
+}
+
+.snapshot-dropdown {
+  flex: 1;
+  min-width: 250px;
+  max-width: 500px;
+  padding: 0.6rem 1rem;
+  font-size: 1rem;
+  border: 2px solid #ccc;
+  border-radius: 6px;
+  background-color: #ffffff;  /* Explicit white */
+  color: #000000;  /* Explicit black */
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+}
+
+/* Ensure selected value is readable when not focused - Session 009D */
+.snapshot-dropdown:not(:focus) {
+  background-color: #ffffff;
+  color: #000000;
+}
+
+.snapshot-dropdown:hover:not(:disabled) {
+  border-color: #003366;
+}
+
+.snapshot-dropdown:focus {
+  outline: none;
+  border-color: #003366;
+  box-shadow: 0 0 0 3px rgba(0, 51, 102, 0.1);
+}
+
+.snapshot-dropdown:disabled {
+  background-color: #f0f0f0;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Fix dropdown option readability - Session 009C */
+.snapshot-dropdown option {
+  color: #000000;
+  background-color: #ffffff;
+  padding: 0.5rem;
+}
+
+/* Dark mode override - ensure readability in all color schemes - Session 009D */
+@media (prefers-color-scheme: dark) {
+  .snapshot-dropdown {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    border-color: #ccc !important;
+  }
+
+  .snapshot-dropdown:not(:focus) {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  .snapshot-dropdown option {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+  }
+}
+
+/* Status Messages */
+.loading-text,
+.error-text,
+.info-text {
+  font-size: 0.875rem;
+  font-style: italic;
+}
+
+.loading-text {
+  color: #666;
+}
+
+.error-text {
+  color: #c62828;
+  font-weight: 500;
+}
+
+.info-text {
+  color: #888;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .snapshot-selector {
+    padding: 0.75rem;
+  }
+
+  .snapshot-selector .view-toggle {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .snapshot-selector .view-toggle label {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .snapshot-controls {
+    gap: 1rem;
+  }
+
+  .year-selector {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .year-buttons {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .year-button {
+    flex: 1;
+    min-width: 70px;
+  }
+
+  .date-selector {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .snapshot-dropdown {
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+/* Dark Mode Support (future enhancement) */
+@media (prefers-color-scheme: dark) {
+  .snapshot-selector {
+    background: #2a2a2a;
+    border-color: #444;
+  }
+
+  .snapshot-selector .view-toggle {
+    border-bottom-color: #444;
+  }
+
+  .snapshot-selector .view-toggle label {
+    color: #e0e0e0 !important;
+  }
+
+  .snapshot-selector .view-toggle label:hover {
+    background-color: #333;
+  }
+
+  .snapshot-dropdown {
+    background-color: #2a2a2a;
+    color: #e0e0e0;
+    border-color: #555;
+  }
+
+  .date-selector label,
+  .year-selector label {
+    color: #e0e0e0;
+  }
+
+  .year-button {
+    background-color: #2a2a2a;
+    color: #e0e0e0;
+    border-color: #555;
+  }
+
+  .year-button:hover:not(:disabled) {
+    background-color: #333;
+  }
+
+  .year-button.active {
+    background-color: #003366;
+    color: white;
+    border-color: #003366;
+  }
+}

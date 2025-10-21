@@ -1,0 +1,867 @@
+/* XCRI Rankings App - USTFCCCA Brand Styling */
+
+/* Import USTFCCCA fonts */
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Roboto:wght@400;600;700&display=swap');
+
+:root {
+  /* USTFCCCA Brand Colors (aligned with iz-apps-clean) */
+  --ustfccca-navy: #003366;           /* Primary brand color */
+  --ustfccca-navy-hover: #002244;     /* Hover state for navy */
+  --ustfccca-blue: #0066cc;           /* Secondary brand color */
+  --ustfccca-blue-hover: #0055aa;     /* Hover state for blue */
+  --ustfccca-orange: #ff6600;         /* Accent color */
+  --ustfccca-white: #ffffff;          /* White */
+  --ustfccca-light-gray: #f8f9fa;     /* Light backgrounds */
+  --ustfccca-medium-gray: #666666;    /* Secondary text */
+  --ustfccca-dark-gray: #333333;      /* Body text */
+  --ustfccca-border-gray: #dee2e6;    /* Borders and dividers */
+
+  /* Semantic Color Aliases (for backwards compatibility) */
+  --primary-color: var(--ustfccca-navy);
+  --secondary-color: var(--ustfccca-blue);
+  --accent-color: var(--ustfccca-orange);
+
+  /* UI Colors */
+  --border-color: var(--ustfccca-border-gray);
+  --hover-bg: var(--ustfccca-light-gray);
+  --row-alt-bg: var(--ustfccca-light-gray);
+  --row-hover-bg: #e3f2fd;
+  --error-color: #dc2626;
+  --success-color: #16a34a;
+  --text-primary: var(--ustfccca-dark-gray);
+  --text-secondary: var(--ustfccca-medium-gray);
+  --bg-white: var(--ustfccca-white);
+  --bg-light: var(--ustfccca-light-gray);
+
+  /* Shadows */
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+
+  /* Typography */
+  --font-body: 'Open Sans', 'Helvetica Neue', Arial, sans-serif;
+  --font-heading: 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+}
+
+/* Global Reset */
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-body);
+  line-height: 1.4;
+  color: var(--text-primary);
+  margin: 0;
+  padding: 0;
+}
+
+/* App Container */
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--bg-light);
+}
+
+/* Page Subtitle (below header) */
+.page-subtitle {
+  background: linear-gradient(to bottom, white, var(--bg-light));
+  padding: 15px 20px;
+  text-align: center;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.page-subtitle p {
+  margin: 0;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+  font-size: 1rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+/* Main Content Container */
+.content {
+  max-width: 1400px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 20px;
+  flex: 1;
+}
+
+/* Controls */
+.controls {
+  background: var(--bg-white);
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 20px;
+}
+
+.controls-row {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 15px;
+}
+
+.controls-row:last-child {
+  margin-bottom: 0;
+}
+
+/* Division Selector */
+.division-selector {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.division-selector label {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.selector-input {
+  padding: 8px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-size: 1rem;
+  background: var(--bg-white);
+  cursor: pointer;
+}
+
+.selector-input:hover {
+  border-color: var(--primary-color);
+}
+
+/* Gender Selector & View Toggle */
+.gender-selector,
+.view-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.gender-selector label,
+.view-toggle label {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.button-group {
+  display: flex;
+  gap: 5px;
+}
+
+.selector-button {
+  padding: 8px 16px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-white);
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 1rem;
+  transition: all 0.2s;
+}
+
+.selector-button:hover:not(.active) {
+  background: var(--hover-bg);
+  border-color: var(--ustfccca-blue);
+}
+
+.selector-button.active {
+  background: var(--ustfccca-navy);
+  color: white;
+  border-color: var(--ustfccca-navy);
+  font-weight: 600;
+}
+
+/* Search Bar */
+.search-bar {
+  display: flex;
+  gap: 10px;
+  flex: 1;
+  min-width: 300px;
+}
+
+.search-input {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: var(--ustfccca-blue);
+  box-shadow: 0 0 0 2px rgba(0, 102, 204, 0.2);
+}
+
+.search-button,
+.clear-button {
+  padding: 8px 16px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-white);
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 1rem;
+  transition: all 0.2s;
+}
+
+.search-button:hover {
+  background: var(--ustfccca-navy);
+  color: white;
+  border-color: var(--ustfccca-navy);
+}
+
+.clear-button:hover {
+  background: var(--error-color);
+  color: white;
+  border-color: var(--error-color);
+}
+
+/* Search Hint - Session 009C */
+.search-hint {
+  position: absolute;
+  right: 60px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.75rem;
+  color: #999;
+  background: #f0f0f0;
+  padding: 2px 8px;
+  border-radius: 12px;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Error Message */
+.error-message {
+  background: #fee2e2;
+  border: 1px solid var(--error-color);
+  color: var(--error-color);
+  padding: 15px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+}
+
+/* Results Summary */
+.results-summary {
+  text-align: center;
+  padding: 10px;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+/* Loading */
+.loading-container {
+  text-align: center;
+  padding: 60px 20px;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  margin: 0 auto 15px;
+  border: 4px solid var(--border-color);
+  border-top-color: var(--ustfccca-navy);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* No Results */
+.no-results {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-secondary);
+}
+
+/* Table Container */
+.table-container {
+  background: var(--bg-white);
+  border-radius: 8px;
+  box-shadow: var(--shadow-sm);
+  overflow-x: auto;
+  margin-bottom: 20px;
+}
+
+/* Rankings Table */
+.rankings-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 800px;
+}
+
+.rankings-table thead {
+  background: var(--ustfccca-navy);
+}
+
+.rankings-table th {
+  padding: 12px;
+  text-align: left;
+  font-weight: 600;
+  color: white;
+  border-bottom: none;
+  white-space: nowrap;
+}
+
+.rankings-table td {
+  padding: 12px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.rankings-table tbody tr {
+  transition: background-color 0.15s;
+}
+
+.rankings-table tbody tr:nth-child(even) {
+  background: var(--row-alt-bg);
+}
+
+.rankings-table tbody tr:hover {
+  background: var(--row-hover-bg);
+}
+
+/* Table Cells */
+.rank-cell {
+  font-weight: 600;
+  color: var(--ustfccca-navy);
+  text-align: center;
+  width: 60px;
+}
+
+.name-cell,
+.school-cell {
+  font-weight: 500;
+}
+
+.score-cell,
+.races-cell,
+.h2h-cell,
+.winrate-cell,
+.squad-cell,
+.avg-cell {
+  text-align: center;
+}
+
+.score-cell {
+  font-weight: 600;
+  color: var(--success-color);
+}
+
+/* Pagination */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  padding: 20px;
+  background: var(--bg-white);
+  border-radius: 8px;
+  box-shadow: var(--shadow-sm);
+}
+
+.pagination-button {
+  padding: 10px 20px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-white);
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 1rem;
+  transition: all 0.2s;
+}
+
+.pagination-button:hover:not(:disabled) {
+  background: var(--ustfccca-navy);
+  color: white;
+  border-color: var(--ustfccca-navy);
+}
+
+.pagination-button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.pagination-info {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+/* SCS Table Cell Enhancements */
+.clickable {
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s;
+}
+
+.clickable:hover {
+  background-color: rgba(0, 51, 102, 0.05) !important;
+  color: var(--ustfccca-navy);
+}
+
+.info-icon {
+  display: inline-block;
+  margin-left: 4px;
+  font-size: 0.85em;
+  color: var(--ustfccca-blue);
+  font-weight: 600;
+}
+
+.rank-diff {
+  display: inline-block;
+  margin-left: 6px;
+  font-size: 0.85em;
+  font-weight: 500;
+  padding: 2px 6px;
+  border-radius: 3px;
+  background-color: #f0f0f0;
+}
+
+.rank-diff.positive {
+  color: var(--success-color);
+}
+
+.rank-diff.negative {
+  color: var(--error-color);
+}
+
+/* Athlete Profile Links */
+.athlete-link {
+  color: var(--ustfccca-navy);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s, text-decoration 0.2s;
+}
+
+.athlete-link:hover {
+  color: var(--ustfccca-blue);
+  text-decoration: underline;
+}
+
+.athlete-link:visited {
+  color: #4a5568;
+}
+
+/* Team Profile Links */
+.team-link {
+  color: var(--ustfccca-navy);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s, text-decoration 0.2s;
+}
+
+.team-link:hover {
+  color: var(--ustfccca-blue);
+  text-decoration: underline;
+}
+
+/* Team Profile Page */
+.team-profile {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.team-header {
+  margin-bottom: 20px;
+}
+
+.team-header h2 {
+  margin-bottom: 5px;
+  color: var(--ustfccca-navy);
+}
+
+.team-id-note {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+.team-info {
+  background: var(--bg-light);
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 30px;
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.info-row:last-child {
+  border-bottom: none;
+}
+
+.info-label {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.info-value {
+  color: var(--ustfccca-navy);
+  font-weight: 500;
+}
+
+.back-button {
+  background: var(--text-secondary);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-bottom: 20px;
+  font-size: 0.95rem;
+  transition: background 0.2s;
+}
+
+.back-button:hover {
+  background: #5a6268;
+}
+
+.roster-section {
+  margin-top: 30px;
+}
+
+.roster-section h3 {
+  margin-bottom: 15px;
+  color: var(--ustfccca-navy);
+}
+
+.stub-message {
+  background: #fff3cd;
+  border: 1px solid #ffc107;
+  border-radius: 8px;
+  padding: 30px;
+  text-align: center;
+  box-shadow: var(--shadow-sm);
+}
+
+.stub-message h4 {
+  color: #856404;
+  margin-bottom: 15px;
+  font-size: 1.25rem;
+}
+
+.stub-message p {
+  color: #856404;
+  margin-bottom: 10px;
+  line-height: 1.6;
+}
+
+.stub-note {
+  color: #6c757d;
+  font-size: 0.9rem;
+  margin-top: 15px;
+  font-style: italic;
+}
+
+.feature-list {
+  list-style: none;
+  padding: 0;
+  margin: 15px auto 0;
+  max-width: 400px;
+  text-align: left;
+}
+
+.feature-list li {
+  padding: 5px 0;
+  color: #856404;
+}
+
+.feature-list li::before {
+  content: "✓ ";
+  color: #28a745;
+  font-weight: bold;
+  margin-right: 8px;
+}
+
+.roster-table {
+  margin-top: 20px;
+}
+
+.roster-table .top-seven {
+  background: #fff3cd;
+  font-weight: 500;
+}
+
+.roster-table .top-seven:hover {
+  background: #ffe8a1 !important;
+}
+
+/* Responsive - Team Profile */
+@media (max-width: 768px) {
+  .team-profile {
+    padding: 15px;
+  }
+
+  .info-row {
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .stub-message {
+    padding: 20px;
+  }
+
+  .feature-list {
+    font-size: 0.9rem;
+  }
+}
+
+/* Footer */
+.app-footer {
+  margin-top: auto;
+  padding-top: 30px;
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  border-top: 1px solid var(--border-color);
+}
+
+.app-footer .footer-links {
+  margin-top: 10px;
+  font-size: 0.95rem;
+}
+
+.app-footer .footer-links a {
+  color: var(--ustfccca-navy);
+  text-decoration: none;
+  margin: 0 8px;
+  transition: color 0.2s, text-decoration 0.2s;
+}
+
+.app-footer .footer-links a:hover {
+  color: var(--ustfccca-blue);
+  text-decoration: underline;
+}
+
+/* Responsive Design */
+
+/* Tablet (max-width: 1024px) */
+@media (max-width: 1024px) {
+  .app {
+    max-width: 100%;
+    padding: 16px;
+  }
+
+  .controls-row {
+    gap: 16px;
+  }
+
+  .rankings-table {
+    font-size: 0.9rem;
+  }
+
+  .rankings-table th,
+  .rankings-table td {
+    padding: 10px 8px;
+  }
+}
+
+/* Mobile (max-width: 768px) */
+@media (max-width: 768px) {
+  .app {
+    padding: 10px;
+  }
+
+  .app-header {
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+  }
+
+  .app-header h1 {
+    font-size: 1.75rem;
+  }
+
+  .app-header .subtitle {
+    font-size: 0.95rem;
+  }
+
+  .controls {
+    padding: 15px;
+  }
+
+  .controls-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 15px;
+  }
+
+  .division-selector,
+  .gender-selector,
+  .view-toggle {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .selector-input,
+  .button-group {
+    width: 100%;
+  }
+
+  .search-bar {
+    min-width: 0;
+    flex-direction: column;
+  }
+
+  .search-button,
+  .clear-button {
+    width: 100%;
+  }
+
+  /* Horizontal scroll for tables on mobile */
+  .table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .rankings-table {
+    font-size: 0.8rem;
+    min-width: 900px; /* Wider due to SCS columns */
+  }
+
+  .rankings-table th,
+  .rankings-table td {
+    padding: 8px 6px;
+    white-space: nowrap;
+  }
+
+  /* Make rank cells more compact */
+  .rank-cell {
+    width: 45px;
+  }
+
+  /* Adjust SCS info icon for mobile */
+  .info-icon {
+    font-size: 0.8em;
+  }
+
+  /* Smaller rank diff badges on mobile */
+  .rank-diff {
+    font-size: 0.75em;
+    padding: 1px 4px;
+  }
+
+  .pagination {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .pagination-button {
+    width: 100%;
+  }
+
+  .results-summary {
+    font-size: 0.85rem;
+    padding: 8px;
+  }
+}
+
+/* Small Mobile (max-width: 480px) */
+@media (max-width: 480px) {
+  .app {
+    padding: 8px;
+  }
+
+  .app-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .app-header .subtitle {
+    font-size: 0.85rem;
+  }
+
+  .controls {
+    padding: 12px;
+    margin-bottom: 16px;
+  }
+
+  .controls-row {
+    gap: 12px;
+  }
+
+  .rankings-table {
+    font-size: 0.75rem;
+    min-width: 850px;
+  }
+
+  .rankings-table th,
+  .rankings-table td {
+    padding: 6px 4px;
+  }
+
+  .rank-cell {
+    width: 40px;
+  }
+
+  /* Touch-friendly tap targets */
+  .clickable {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .pagination-button,
+  .selector-button {
+    min-height: 44px; /* iOS recommended tap target size */
+  }
+}
+
+/* Historical Rankings Section (Session 010) */
+.historical-rankings-section {
+  margin-top: 30px;
+}
+
+.historical-rankings-section h3 {
+  font-size: 1.25rem;
+  margin-bottom: 15px;
+  color: var(--text-primary);
+}
+
+/* Rank Change Indicators */
+.rank-change {
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-left: 8px;
+}
+
+.rank-change.improved {
+  color: var(--success-color);
+}
+
+.rank-change.declined {
+  color: var(--error-color);
+}
+
+.rank-change.same {
+  color: var(--text-secondary);
+}
+
+/* Historical Table Specific Styles */
+.historical-table .date-cell {
+  font-weight: 500;
+}
+
+.historical-table .athletes-cell {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
