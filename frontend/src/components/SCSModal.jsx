@@ -22,11 +22,15 @@ export default function SCSModal({ athlete, onClose }) {
         setLoading(true);
         setError(null);
 
+        // Use athlete's season_year if available, otherwise derive from current year
+        // Session 003 Issue #17: Fixed hardcoded 2024 to use current season (2025)
+        const seasonYear = athlete.season_year || 2025;
+
         const response = await api.get(
           `/scs/athletes/${athlete.anet_athlete_hnd}/components`,
           {
             params: {
-              season_year: 2024,
+              season_year: seasonYear,
               division: athlete.division_code,
               gender: athlete.gender_code
             }
