@@ -54,8 +54,16 @@ if ! ssh "$SERVER" "test -f $REMOTE_PATH/api-proxy.cgi"; then
   ssh "$SERVER" "chmod +x $REMOTE_PATH/api-proxy.cgi"
   echo "  ✓ api-proxy.cgi restored"
 else
-  echo "  ✓ .htaccess already present"
+  echo "  ✓ api-proxy.cgi already present"
 fi
+echo ""
+
+# Step 5: Fix file permissions for static assets
+echo "[5/5] Fixing file permissions..."
+ssh "$SERVER" "chmod -R 644 $REMOTE_PATH/*.{png,jpg,jpeg,gif,svg,ico,css,js,html,json} 2>/dev/null || true"
+ssh "$SERVER" "chmod 755 $REMOTE_PATH/assets 2>/dev/null || true"
+ssh "$SERVER" "chmod 644 $REMOTE_PATH/assets/* 2>/dev/null || true"
+echo "✓ File permissions fixed"
 echo ""
 
 echo "================================================"
