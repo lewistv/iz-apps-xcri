@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import Header from './components/Header';
 import Breadcrumb from './components/Breadcrumb';
@@ -56,6 +56,10 @@ function MainRankingsView() {
   // Session 009C: Full dataset for client-side filtering
   const [fullDataset, setFullDataset] = useState([]);
 
+  // Debounce timer refs (Issue #8: Prevent overwhelming with rapid changes)
+  const debounceTimerRef = useRef(null);  // For API calls (filter changes)
+  const searchDebounceRef = useRef(null); // For search input
+
   // Derive current season year (2025 for current, extract from snapshot for historical)
   const getCurrentSeasonYear = () => {
     if (isHistorical && selectedSnapshot) {
@@ -97,18 +101,55 @@ function MainRankingsView() {
   }, [division, gender, view, isHistorical, selectedSnapshot]);
 
   // Fetch data when filters change (Session 010: Server-side region/conference filtering)
+  // Issue #8: Debounce to prevent overwhelming API with rapid filter changes
   useEffect(() => {
-    if (isHistorical && selectedSnapshot) {
-      fetchHistoricalData();
-    } else if (!isHistorical) {
-      fetchCurrentData();
+    // Clear existing timer
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
     }
-    // Don't fetch if historical mode but no snapshot selected
+
+    // Show loading state immediately for instant UI feedback
+    setLoading(true);
+
+    // Set new debounced timer (300ms delay)
+    debounceTimerRef.current = setTimeout(() => {
+      if (isHistorical && selectedSnapshot) {
+        fetchHistoricalData();
+      } else if (!isHistorical) {
+        fetchCurrentData();
+      } else {
+        // No snapshot selected in historical mode
+        setLoading(false);
+      }
+    }, 300);
+
+    // Cleanup: Clear timer on unmount or dependency change
+    return () => {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
+    };
   }, [division, gender, view, isHistorical, selectedSnapshot, region, conference]);
 
   // Apply client-side filtering and pagination (Session 010: Only search is client-side now)
+  // Issue #8: Debounce search to prevent excessive re-renders while typing
   useEffect(() => {
-    applyFiltersAndPagination();
+    // Clear existing search timer
+    if (searchDebounceRef.current) {
+      clearTimeout(searchDebounceRef.current);
+    }
+
+    // Debounce search (150ms - shorter delay for instant feedback)
+    searchDebounceRef.current = setTimeout(() => {
+      applyFiltersAndPagination();
+    }, 150);
+
+    // Cleanup
+    return () => {
+      if (searchDebounceRef.current) {
+        clearTimeout(searchDebounceRef.current);
+      }
+    };
   }, [fullDataset, search, offset]);
 
   /**
