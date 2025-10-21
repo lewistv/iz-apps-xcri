@@ -25,7 +25,7 @@ from fastapi.responses import JSONResponse
 from config import settings
 from database import validate_database_connection, get_table_counts
 from models import HealthCheckResponse, ErrorResponse
-from routes import athletes, teams, metadata, snapshots, scs, components
+from routes import athletes, teams, metadata, snapshots, scs, components, feedback
 
 # Configure logging
 logging.basicConfig(
@@ -225,6 +225,7 @@ app.include_router(metadata.router)
 app.include_router(snapshots.router)
 app.include_router(scs.router)  # Frontend Session 004: SCS component endpoints
 app.include_router(components.router)  # Backend Session 003: Component score API
+app.include_router(feedback.router)  # User feedback submission (creates GitHub issues)
 
 
 # ===================================================================

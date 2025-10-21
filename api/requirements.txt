@@ -14,5 +14,8 @@ pydantic-settings==2.1.0
 pandas>=2.1.0
 openpyxl>=3.1.0
 
+# HTTP client (for GitHub API integration)
+httpx>=0.25.0
+
 # Note: Database drivers (pymysql) are already in main requirements.txt
 # Import database connection from algorithms/shared/database_connection.py

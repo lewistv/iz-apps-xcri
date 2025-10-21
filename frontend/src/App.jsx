@@ -17,6 +17,7 @@ import ExplainerBox from './components/ExplainerBox';
 import FAQ from './pages/FAQ';
 import HowItWorks from './pages/HowItWorks';
 import Glossary from './pages/Glossary';
+import Feedback from './pages/Feedback';
 import { athletesAPI, teamsAPI, snapshotAPI } from './services/api';
 import './App.css';
 
@@ -524,6 +525,7 @@ export default function App() {
       <Route path="/faq" element={<FAQ />} />
       <Route path="/how-it-works" element={<HowItWorks />} />
       <Route path="/glossary" element={<Glossary />} />
+      <Route path="/feedback" element={<Feedback />} />
     </Routes>
   );
 }

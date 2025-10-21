@@ -1,0 +1,246 @@
+/* Feedback Page Styles */
+
+.feedback-page {
+  min-height: 100vh;
+  background-color: #f5f5f5;
+  padding: 2rem 1rem;
+}
+
+.feedback-container {
+  max-width: 800px;
+  margin: 0 auto;
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.feedback-intro {
+  margin-bottom: 2rem;
+  padding: 1rem;
+  background-color: #e3f2fd;
+  border-left: 4px solid #2196f3;
+  border-radius: 4px;
+}
+
+.feedback-intro p {
+  margin: 0.5rem 0;
+  color: #1565c0;
+}
+
+/* Form Sections */
+.form-section {
+  margin-bottom: 2rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.form-section:last-of-type {
+  border-bottom: none;
+}
+
+.form-section h3 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: #333;
+  font-size: 1.2rem;
+}
+
+/* Form Groups */
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.form-group .required {
+  color: #d32f2f;
+  margin-left: 0.25rem;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-family: inherit;
+  transition: border-color 0.2s;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #2196f3;
+  box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 150px;
+}
+
+.form-help {
+  display: block;
+  margin-top: 0.5rem;
+  color: #666;
+  font-size: 0.875rem;
+}
+
+/* Form Actions */
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.btn-submit,
+.btn-cancel,
+.btn-primary,
+.btn-secondary {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+  transition: all 0.2s;
+}
+
+.btn-submit,
+.btn-primary {
+  background-color: #2196f3;
+  color: white;
+}
+
+.btn-submit:hover:not(:disabled),
+.btn-primary:hover {
+  background-color: #1976d2;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(33, 150, 243, 0.3);
+}
+
+.btn-submit:disabled {
+  background-color: #bdbdbd;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-cancel,
+.btn-secondary {
+  background-color: #f5f5f5;
+  color: #333;
+}
+
+.btn-cancel:hover,
+.btn-secondary:hover {
+  background-color: #e0e0e0;
+}
+
+/* Error Message */
+.error-message {
+  padding: 1rem;
+  background-color: #ffebee;
+  border-left: 4px solid #d32f2f;
+  border-radius: 4px;
+  color: #c62828;
+  margin-bottom: 1rem;
+}
+
+/* Success State */
+.feedback-success {
+  text-align: center;
+  padding: 3rem 2rem;
+}
+
+.feedback-success h2 {
+  color: #4caf50;
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.feedback-success p {
+  font-size: 1.1rem;
+  color: #666;
+  margin: 1rem 0;
+}
+
+.issue-link {
+  margin: 2rem 0 !important;
+}
+
+.issue-link a {
+  color: #2196f3;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.issue-link a:hover {
+  text-decoration: underline;
+}
+
+.success-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+/* Rate Limit Notice */
+.rate-limit-notice {
+  margin-top: 1rem;
+  padding: 0.75rem;
+  background-color: #fff3e0;
+  border-radius: 4px;
+  text-align: center;
+}
+
+.rate-limit-notice small {
+  color: #e65100;
+}
+
+/* Footer */
+.feedback-footer {
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e0e0e0;
+  text-align: center;
+}
+
+.feedback-footer a {
+  color: #2196f3;
+  text-decoration: none;
+}
+
+.feedback-footer a:hover {
+  text-decoration: underline;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .feedback-container {
+    padding: 1rem;
+  }
+
+  .form-actions,
+  .success-actions {
+    flex-direction: column;
+  }
+
+  .btn-submit,
+  .btn-cancel,
+  .btn-primary,
+  .btn-secondary {
+    width: 100%;
+  }
+}

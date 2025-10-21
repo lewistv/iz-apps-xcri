@@ -26,8 +26,9 @@ export default function Footer() {
             <Link to="/glossary" className="footer-link">Glossary</Link>
             <span className="footer-separator">|</span>
             <Link to="/faq" className="footer-link">FAQ</Link>
-          </div>
-        </div>
+            <span className="footer-separator">|</span>
+            <Link to="/feedback" className="footer-link">Feedback</Link>
+          </div>        </div>
       </div>
     </footer>
   );
