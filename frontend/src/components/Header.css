@@ -1,104 +1,88 @@
-/* USTFCCCA Header Styling */
+/* USTFCCCA Shared Header Styling */
+/* Matches iz-apps-clean/shared/templates/base.html */
+/* Session 004: Integrated shared header (Issue #10) */
 
-.ustfccca-header {
+/* WordPress-style header */
+.wp-block-template-part {
   background: white;
-  border-bottom: 2px solid var(--ustfccca-border-gray);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  position: sticky;
-  top: 0;
-  z-index: 100;
+  border-bottom: 1px solid #e0e0e0;
+  margin-bottom: 0;
 }
 
-.header-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 20px;
-}
-
-.header-content {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  padding: 20px 0;
-}
-
-.logo-section {
-  flex-shrink: 0;
-  text-decoration: none;
-  transition: transform 0.2s ease;
-}
-
-.logo-section:hover {
-  transform: scale(1.05);
-}
-
-.logo-placeholder {
-  background: var(--ustfccca-navy);
-  color: white;
-  font-weight: bold;
-  font-size: 0.9rem;
-  padding: 10px 15px;
-  border-radius: 4px;
-  letter-spacing: 1px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.logo-text {
-  display: block;
-}
-
-.title-section {
-  flex-grow: 1;
+.ustfccca-logo {
+  max-width: 80px;
+  height: auto;
 }
 
 .site-title {
-  margin: 0;
-  font-size: 1.75rem;
-  font-weight: 700;
-  color: var(--ustfccca-navy);
-  line-height: 1.2;
-  font-family: var(--font-heading);
+  margin: 0 !important;
+  font-size: 1.8rem !important;
+  font-weight: bold !important;
+  color: #003366 !important;
+  line-height: 1.2 !important;
+  display: block !important;
+  width: 100% !important;
+}
+
+.site-title a {
+  color: #003366 !important;
+  text-decoration: none !important;
+  display: block !important;
 }
 
 .site-tagline {
-  margin: 0.5rem 0 0 0;
-  font-size: 0.9rem;
-  color: var(--ustfccca-medium-gray);
-  line-height: 1.3;
-  font-weight: 400;
+  margin: 0 !important;
+  margin-top: 0.5rem !important;
+  font-size: 0.9rem !important;
+  color: #666 !important;
+  line-height: 1.3 !important;
+  display: block !important;
+  width: 100% !important;
 }
 
-/* Responsive Design */
+/* Ensure vertical stacking */
+.wp-block-group.is-vertical {
+  flex-direction: column !important;
+  align-items: flex-start !important;
+}
+
+.header-navigation {
+  align-items: center;
+}
+
+.social-links {
+  margin-right: 1rem;
+}
+
+.social-links a {
+  color: #666 !important;
+  margin: 0 0.25rem;
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+}
+
+.header-buttons .ui.button {
+  margin: 0 0.25rem;
+  font-size: 0.85rem;
+  padding: 0.5rem 1rem;
+}
+
+/* WordPress-style responsive header */
 @media (max-width: 768px) {
-  .header-content {
+  .wp-block-group.alignwide {
     flex-direction: column;
-    align-items: flex-start;
-    gap: 15px;
-    padding: 15px 0;
+    align-items: flex-start !important;
   }
 
-  .site-title {
-    font-size: 1.4rem;
+  .header-navigation {
+    width: 100%;
+    justify-content: space-between;
+    margin-top: 1rem;
   }
 
-  .site-tagline {
-    font-size: 0.85rem;
-  }
-
-  .logo-placeholder {
-    font-size: 0.8rem;
-    padding: 8px 12px;
-  }
-}
-
-@media (max-width: 480px) {
-  .site-title {
-    font-size: 1.2rem;
-  }
-
-  .site-tagline {
-    font-size: 0.8rem;
+  .social-links {
+    margin-right: 0;
+    margin-bottom: 1rem;
   }
 }
