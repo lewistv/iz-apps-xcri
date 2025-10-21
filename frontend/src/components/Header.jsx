@@ -15,12 +15,12 @@ export default function Header() {
     <header className="ustfccca-header">
       <div className="header-container">
         <div className="header-content">
-          <Link to="https://www.ustfccca.org" className="logo-section">
+          <a href="https://www.ustfccca.org" className="logo-section" target="_blank" rel="noopener noreferrer">
             {/* Logo placeholder - can be replaced with actual USTFCCCA logo */}
             <div className="logo-placeholder">
               <span className="logo-text">USTFCCCA</span>
             </div>
-          </Link>
+          </a>
           <div className="title-section">
             <h1 className="site-title">
               XCRI: Cross Country Ratings Index

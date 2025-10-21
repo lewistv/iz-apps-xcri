@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import './ExplainerBox.css';
 
 export default function ExplainerBox({ title, children, links = [] }) {
@@ -10,9 +11,9 @@ export default function ExplainerBox({ title, children, links = [] }) {
       {links.length > 0 && (
         <div className="explainer-links">
           {links.map((link, idx) => (
-            <a key={idx} href={link.href} className="explainer-link">
+            <Link key={idx} to={link.href} className="explainer-link">
               {link.text} →
-            </a>
+            </Link>
           ))}
         </div>
       )}
