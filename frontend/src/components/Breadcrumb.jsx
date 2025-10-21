@@ -14,11 +14,9 @@ export default function Breadcrumb() {
       <div className="breadcrumb-container">
         <ol className="breadcrumb-list">
           <li className="breadcrumb-item">
-            <span className="breadcrumb-link">Home</span>
-          </li>
-          <li className="breadcrumb-separator" aria-hidden="true">›</li>
-          <li className="breadcrumb-item">
-            <span className="breadcrumb-link">Rankings</span>
+            <a href="https://web4.ustfccca.org/iz/" className="breadcrumb-link">
+              USTFCCCA InfoZone
+            </a>
           </li>
           <li className="breadcrumb-separator" aria-hidden="true">›</li>
           <li className="breadcrumb-item breadcrumb-current" aria-current="page">
