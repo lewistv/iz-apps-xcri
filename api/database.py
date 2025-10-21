@@ -1,107 +1,98 @@
 """
 XCRI Rankings API - Database Connection Management
 
-Wraps the existing database_connection module from algorithms/shared/
-and provides connection helpers for FastAPI routes.
+Standalone database module for XCRI API using PyMySQL.
 """
 
-import sys
 import logging
-from pathlib import Path
 from contextlib import contextmanager
+from typing import Dict, Any, Tuple, Optional, List
 
-# Add parent directory to Python path to import from algorithms/
-project_root = Path(__file__).parent.parent.parent
-sys.path.insert(0, str(project_root))
-
-from algorithms.shared.database_connection import (
-    DatabaseConfig,
-    get_db_connection,
-    test_connection
-)
-from webapp.api.config import settings, get_database_config_path
+import pymysql
+from pymysql.cursors import DictCursor
 
 logger = logging.getLogger(__name__)
 
 
 # ===================================================================
-# Database Configuration Initialization
+# Database Configuration
 # ===================================================================
 
-def initialize_db_config() -> DatabaseConfig:
-    """
-    Initialize database configuration from settings.
+class DatabaseConfig:
+    """Database configuration from Pydantic settings"""
 
-    Tries in order:
-    1. Config file (if XCRI_DB_CONFIG_PATH is set)
-    2. Environment variables (if credentials provided)
+    def __init__(self, settings=None):
+        # Import here to avoid circular dependency
+        if settings is None:
+            from config import settings as app_settings
+            settings = app_settings
 
-    Returns:
-        DatabaseConfig instance
+        self.host = settings.database_host
+        self.port = settings.database_port
+        self.database = settings.database_name
+        self.user = settings.database_user
+        self.password = settings.database_password
+        self.charset = getattr(settings, 'database_charset', 'utf8mb4')
 
-    Raises:
-        ValueError: If configuration is insufficient
-    """
-    # Try config file first
-    config_path = get_database_config_path()
-    if config_path:
-        logger.info(f"Loading database config from file: {config_path}")
-        return DatabaseConfig.from_config_file(config_path)
+        if not self.password:
+            raise ValueError("DATABASE_PASSWORD is required in settings")
 
-    # Try environment variables
-    if settings.xcri_db_user and settings.xcri_db_password:
-        logger.info("Loading database config from environment variables")
-        return DatabaseConfig(
-            host=settings.xcri_db_host,
-            port=settings.xcri_db_port,
-            user=settings.xcri_db_user,
-            password=settings.xcri_db_password,
-            database=settings.xcri_db_name,
-            charset=settings.xcri_db_charset
-        )
-
-    raise ValueError(
-        "Database configuration not found. Please provide either:\n"
-        "1. XCRI_DB_CONFIG_PATH pointing to a .ini/.cnf file, or\n"
-        "2. Individual credentials: XCRI_DB_USER, XCRI_DB_PASSWORD"
-    )
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert to dictionary for pymysql.connect()"""
+        return {
+            'host': self.host,
+            'port': self.port,
+            'database': self.database,
+            'user': self.user,
+            'password': self.password,
+            'charset': self.charset,
+            'cursorclass': DictCursor,
+            'autocommit': True
+        }
 
 
-# Global database config instance
-db_config = initialize_db_config()
+# Global database config (lazily initialized on first use)
+db_config = None
 
 
 # ===================================================================
-# Connection Helpers for FastAPI
+# Connection Helpers
 # ===================================================================
 
 @contextmanager
 def get_db():
     """
-    Context manager for database connections in FastAPI routes.
+    Context manager for database connections.
 
     Usage:
         with get_db() as conn:
-            with conn.cursor() as cursor:
-                cursor.execute("SELECT * FROM table")
-                results = cursor.fetchall()
+            cursor = conn.cursor()
+            cursor.execute("SELECT * FROM table")
+            results = cursor.fetchall()
 
     Yields:
-        pymysql.Connection with DictCursor
-
-    Raises:
-        Exception: Any database connection errors
+        pymysql.Connection
     """
-    with get_db_connection(db_config) as conn:
+    global db_config
+    if db_config is None:
+        db_config = DatabaseConfig()
+
+    conn = None
+    try:
+        conn = pymysql.connect(**db_config.to_dict())
         yield conn
+    except pymysql.Error as e:
+        logger.error(f"Database connection error: {e}")
+        raise
+    finally:
+        if conn:
+            conn.close()
 
 
 @contextmanager
 def get_db_cursor():
     """
     Context manager for database cursor (simplified).
-
-    Automatically commits on success, rolls back on error.
 
     Usage:
         with get_db_cursor() as cursor:
@@ -110,115 +101,86 @@ def get_db_cursor():
 
     Yields:
         pymysql.cursors.DictCursor
-
-    Raises:
-        Exception: Any database errors
     """
-    with get_db_connection(db_config) as conn:
+    with get_db() as conn:
+        cursor = None
         try:
-            with conn.cursor() as cursor:
-                yield cursor
-            conn.commit()
-        except Exception as e:
-            conn.rollback()
-            logger.error(f"Database error: {e}")
+            cursor = conn.cursor()
+            yield cursor
+        except pymysql.Error as e:
+            logger.error(f"Database query error: {e}")
             raise
+        finally:
+            if cursor:
+                cursor.close()
 
 
-def test_db_connection() -> bool:
+# ===================================================================
+# Helper Functions
+# ===================================================================
+
+def test_connection() -> bool:
     """
-    Test database connection and log result.
+    Test database connection.
 
     Returns:
         True if connection successful, False otherwise
     """
     try:
-        result = test_connection(db_config, verbose=True)
-        if result:
+        with get_db() as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT 1")
+            cursor.fetchone()
+            cursor.close()
             logger.info("✓ Database connection test passed")
-        else:
-            logger.error("✗ Database connection test failed")
-        return result
-    except Exception as e:
-        logger.error(f"✗ Database connection test error: {e}")
+            return True
+    except pymysql.Error as e:
+        logger.error(f"✗ Database connection test failed: {e}")
         return False
 
+    return False
 
-def get_table_counts() -> dict:
+
+def get_table_counts() -> Dict[str, int]:
     """
     Get record counts from XCRI ranking tables.
 
     Returns:
         Dictionary with table names and record counts
-
-    Raises:
-        Exception: If database query fails
     """
     with get_db_cursor() as cursor:
-        # Get athlete rankings count
-        cursor.execute("SELECT COUNT(*) as cnt FROM iz_rankings_xcri_athlete_rankings")
-        athlete_count = cursor.fetchone()['cnt']
+        counts = {}
 
-        # Get team rankings count
-        cursor.execute("SELECT COUNT(*) as cnt FROM iz_rankings_xcri_team_rankings")
-        team_count = cursor.fetchone()['cnt']
+        tables = [
+            'iz_rankings_xcri_athlete_rankings',
+            'iz_rankings_xcri_team_rankings',
+            'iz_rankings_xcri_scs_components'
+        ]
 
-        # Get metadata count
-        cursor.execute("SELECT COUNT(*) as cnt FROM iz_rankings_xcri_calculation_metadata")
-        metadata_count = cursor.fetchone()['cnt']
+        for table in tables:
+            try:
+                cursor.execute(f"SELECT COUNT(*) as cnt FROM {table}")
+                result = cursor.fetchone()
+                counts[table] = result['cnt'] if result else 0
+            except pymysql.Error as e:
+                logger.warning(f"Could not count {table}: {e}")
+                counts[table] = 0
 
-        return {
-            "athlete_rankings": athlete_count,
-            "team_rankings": team_count,
-            "calculation_metadata": metadata_count
-        }
-
-
-# ===================================================================
-# Startup Validation
-# ===================================================================
-
-def validate_database_connection():
-    """
-    Validate database connection on application startup.
-
-    Raises:
-        Exception: If connection fails or tables don't exist
-    """
-    logger.info("Validating database connection...")
-
-    # Test connection
-    if not test_db_connection():
-        raise Exception("Database connection failed")
-
-    # Check table counts
-    try:
-        counts = get_table_counts()
-        logger.info(f"Database validation successful:")
-        logger.info(f"  - Athlete rankings: {counts['athlete_rankings']:,} records")
-        logger.info(f"  - Team rankings: {counts['team_rankings']:,} records")
-        logger.info(f"  - Metadata: {counts['calculation_metadata']} records")
-
-        if counts['athlete_rankings'] == 0:
-            logger.warning("WARNING: No athlete rankings found in database")
-
-    except Exception as e:
-        logger.error(f"Database validation failed: {e}")
-        raise Exception(f"Database tables not found or inaccessible: {e}")
+        return counts
 
 
 # ===================================================================
-# Helper Functions for Common Queries
+# Query Builder Helper
 # ===================================================================
 
 def build_where_clause(
     season_year: int,
-    division: int = None,
-    gender: str = None,
+    division: Optional[int] = None,
+    gender: Optional[str] = None,
     scoring_group: str = "division",
-    checkpoint_date: str = None,
+    checkpoint_date: Optional[str] = None,
     algorithm_type: str = "light"
-) -> tuple:
+) -> Tuple[str, List[Any]]:
     """
     Build WHERE clause for common XCRI queries.
 
@@ -262,3 +224,35 @@ def build_where_clause(
 
     where_sql = " AND ".join(where_clauses)
     return where_sql, params
+
+
+# ===================================================================
+# Startup Validation
+# ===================================================================
+
+def validate_database_connection():
+    """
+    Validate database connection on application startup.
+
+    Raises:
+        Exception: If connection fails or tables don't exist
+    """
+    logger.info("Validating database connection...")
+
+    # Test connection
+    if not test_connection():
+        raise Exception("Database connection failed")
+
+    # Check table counts
+    try:
+        counts = get_table_counts()
+        logger.info("Database validation successful:")
+        for table, count in counts.items():
+            logger.info(f"  - {table}: {count:,} records")
+
+        if counts.get('iz_rankings_xcri_athlete_rankings', 0) == 0:
+            logger.warning("WARNING: No athlete rankings found in database")
+
+    except Exception as e:
+        logger.error(f"Database validation failed: {e}")
+        raise Exception(f"Database tables not found or inaccessible: {e}")
