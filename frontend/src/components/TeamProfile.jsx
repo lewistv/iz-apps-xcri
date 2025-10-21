@@ -109,6 +109,15 @@ export default function TeamProfile() {
     }
   }, [teamId, snapshot, searchParams]);
 
+  // Update page title when team data loads
+  useEffect(() => {
+    if (teamData && teamData.team_name) {
+      document.title = `USTFCCCA ::: XCRI - ${teamData.team_name}`;
+    } else {
+      document.title = 'USTFCCCA ::: XCRI - Team Profile';
+    }
+  }, [teamData]);
+
   // Fetch historical rankings progression (Session 010)
   useEffect(() => {
     const fetchHistoricalRankings = async () => {

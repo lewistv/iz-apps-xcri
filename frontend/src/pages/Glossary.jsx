@@ -13,6 +13,9 @@ export default function Glossary() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Set page title
+    document.title = 'USTFCCCA ::: XCRI - Glossary';
+
     // Load Glossary markdown content (imported directly)
     setContent(glossaryContent);
     setLoading(false);

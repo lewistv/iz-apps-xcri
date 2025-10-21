@@ -66,6 +66,35 @@ function MainRankingsView() {
 
   const seasonYear = getCurrentSeasonYear();
 
+  // Helper function to get division name
+  const getDivisionName = (divCode) => {
+    const divisions = {
+      2030: 'NCAA D1',
+      2031: 'NCAA D2',
+      2032: 'NCAA D3',
+      2040: 'NAIA',
+      2050: 'NJCAA D1',
+      2051: 'NJCAA D2',
+      2052: 'NJCAA D3',
+    };
+    return divisions[divCode] || 'Unknown';
+  };
+
+  // Update page title based on current view and filters
+  useEffect(() => {
+    const divName = getDivisionName(division);
+    const genderText = gender === 'M' ? 'Men' : 'Women';
+    const viewText = view === 'athletes' ? 'Athletes' : 'Teams';
+
+    let title = `USTFCCCA ::: XCRI Rankings - ${divName} ${genderText} ${viewText}`;
+
+    if (isHistorical && selectedSnapshot) {
+      title = `USTFCCCA ::: XCRI Rankings - ${divName} ${genderText} ${viewText} (${selectedSnapshot})`;
+    }
+
+    document.title = title;
+  }, [division, gender, view, isHistorical, selectedSnapshot]);
+
   // Fetch data when filters change (Session 010: Server-side region/conference filtering)
   useEffect(() => {
     if (isHistorical && selectedSnapshot) {

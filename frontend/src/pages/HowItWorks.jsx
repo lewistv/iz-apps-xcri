@@ -13,6 +13,9 @@ export default function HowItWorks() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Set page title
+    document.title = 'USTFCCCA ::: XCRI - How It Works';
+
     // Load How It Works markdown content (imported directly)
     setContent(howItWorksContent);
     setLoading(false);

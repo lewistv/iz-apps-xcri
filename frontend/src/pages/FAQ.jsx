@@ -13,6 +13,9 @@ export default function FAQ() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Set page title
+    document.title = 'USTFCCCA ::: XCRI - Frequently Asked Questions';
+
     // Load FAQ markdown content (imported directly)
     setContent(faqContent);
     setLoading(false);
