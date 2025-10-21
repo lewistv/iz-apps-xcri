@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, useSearchParams } from 'react-router-dom';
 import Header from './components/Header';
 import Breadcrumb from './components/Breadcrumb';
 import Footer from './components/Footer';
@@ -32,11 +32,22 @@ import './App.css';
 
 // Main Rankings View Component
 function MainRankingsView() {
+  // URL parameter management (Issue #2: URL persistence for bookmarking/sharing)
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  // Initialize state from URL parameters or use defaults
+  const getInitialDivision = () => parseInt(searchParams.get('division')) || 2030;
+  const getInitialGender = () => searchParams.get('gender') || 'M';
+  const getInitialView = () => searchParams.get('view') || 'athletes';
+  const getInitialRegion = () => searchParams.get('region') || null;
+  const getInitialConference = () => searchParams.get('conference') || null;
+  const getInitialSearch = () => searchParams.get('search') || '';
+
   // State management
-  const [division, setDivision] = useState(2030); // D1 by default
-  const [gender, setGender] = useState('M'); // Men by default
-  const [view, setView] = useState('athletes'); // 'athletes' or 'teams'
-  const [search, setSearch] = useState('');
+  const [division, setDivision] = useState(getInitialDivision());
+  const [gender, setGender] = useState(getInitialGender());
+  const [view, setView] = useState(getInitialView());
+  const [search, setSearch] = useState(getInitialSearch());
   const [offset, setOffset] = useState(0);
   const [limit] = useState(100); // Fixed limit (items per page)
   const [data, setData] = useState({ results: [], total: 0 });
@@ -44,8 +55,8 @@ function MainRankingsView() {
   const [error, setError] = useState(null);
 
   // Geographic filter state (Session 009B Phase 4)
-  const [region, setRegion] = useState(null); // null = "All Regions"
-  const [conference, setConference] = useState(null); // null = "All Conferences"
+  const [region, setRegion] = useState(getInitialRegion()); // null = "All Regions"
+  const [conference, setConference] = useState(getInitialConference()); // null = "All Conferences"
   const [availableRegions, setAvailableRegions] = useState([]);
   const [availableConferences, setAvailableConferences] = useState([]);
 
@@ -99,6 +110,21 @@ function MainRankingsView() {
 
     document.title = title;
   }, [division, gender, view, isHistorical, selectedSnapshot]);
+
+  // Update URL parameters when filters change (Issue #2: URL persistence)
+  useEffect(() => {
+    const params = {};
+
+    // Add current filter values to URL (skip defaults to keep URL clean)
+    if (division !== 2030) params.division = division;
+    if (gender !== 'M') params.gender = gender;
+    if (view !== 'athletes') params.view = view;
+    if (region) params.region = region;
+    if (conference) params.conference = conference;
+    if (search) params.search = search;
+
+    setSearchParams(params, { replace: true });
+  }, [division, gender, view, region, conference, search]);
 
   // Fetch data when filters change (Session 010: Server-side region/conference filtering)
   // Issue #8: Debounce to prevent overwhelming API with rapid filter changes
