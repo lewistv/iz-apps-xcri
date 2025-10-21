@@ -15,11 +15,12 @@ This file provides guidance to Claude Code when working with the XCRI Rankings w
 ## Current Status (October 21, 2025)
 
 **Migration Status**: ✅ COMPLETE - Migrated from izzypy_xcri/webapp
-**Git Status**: ✅ Initialized with initial commit
+**Repository**: ✅ Independent repository at https://github.com/lewistv/iz-apps-xcri
 **Deployment Status**: ✅ **DEPLOYED AND OPERATIONAL**
 
 **Production URL**: https://web4.ustfccca.org/iz/xcri/
 **API URL**: https://web4.ustfccca.org/iz/xcri/api/
+**GitHub Issues**: https://github.com/lewistv/iz-apps-xcri/issues
 
 **Next Session**: Cosmetic and practical fixes
 
@@ -52,10 +53,11 @@ This file provides guidance to Claude Code when working with the XCRI Rankings w
 
 ### Deployment
 - **Server**: web4.ustfccca.org
-- **Path**: /home/web4ustfccca/iz/xcri (= this directory on server)
-- **Method**: Git-based deployment (like xc-scoreboard, season-resume)
-- **Process Management**: User systemd (xcri-api.service)
+- **Path**: /home/web4ustfccca/public_html/iz/xcri
+- **Method**: rsync deployment (server is NOT a git repo)
+- **Process Management**: Manual uvicorn + crontab (Option C - see MANUAL_STARTUP.md)
 - **Web Server**: Apache with reverse proxy (.htaccess)
+- **Git Repository**: https://github.com/lewistv/iz-apps-xcri (independent repo)
 
 ---
 
@@ -460,17 +462,25 @@ tail -50 /home/web4ustfccca/iz/xcri/logs/api-error.log
 
 ## Related Projects
 
-**izzypy_xcri** (parent repository):
+**izzypy_xcri** (algorithm and research repository):
 - Location: `/Users/lewistv/code/ustfccca/izzypy_xcri`
-- Purpose: Algorithm development, ranking calculations
-- Database: Read/write access
-- Exports: MySQL database updates
+- Purpose: Algorithm development, ranking calculations, research
+- Database: Read/write access for rankings updates
+- Exports: MySQL database updates for this web app
 
-**iz-apps-clean** (deployment repository):
+**iz-apps-xcri** (this repository):
+- Location: `/Users/lewistv/code/ustfccca/iz-apps-clean/xcri`
+- GitHub: https://github.com/lewistv/iz-apps-xcri
+- Purpose: Display-only web application (production deployment)
+- Database: Read-only access to rankings data
+- Deployment: rsync to web4.ustfccca.org
+
+**iz-apps-clean** (sibling applications):
 - Location: `/Users/lewistv/code/ustfccca/iz-apps-clean`
-- Purpose: Production web applications
-- Server path: `/home/web4ustfccca/iz`
-- Other apps: xc-scoreboard, season-resume
+- GitHub: https://github.com/lewistv/iz-apps-production
+- Purpose: Other USTFCCCA production web applications
+- Server path: `/home/web4ustfccca/public_html/iz`
+- Other apps: xc-scoreboard, season-resume, records-lists
 
 ---
 
