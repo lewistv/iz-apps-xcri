@@ -267,6 +267,45 @@ git pull origin main
 systemctl --user restart xcri-api
 ```
 
+### ⚠️ CRITICAL: Frontend Deployment Best Practices
+
+**SAFE Frontend Deployment** (When you only changed frontend code):
+```bash
+cd frontend
+npm run build
+rsync -avz dist/ ustfccca-web4:/home/web4ustfccca/public_html/iz/xcri/
+```
+
+**❌ NEVER USE `--delete` FLAG ❌**
+
+The `--delete` flag will **REMOVE CRITICAL FILES** that are not in `frontend/dist/`:
+- `.htaccess` (Apache configuration - site will break)
+- `api-proxy.cgi` (API routing - API will be unreachable)
+- `api/` directory (Backend code and venv)
+
+**What was deleted on October 22, 2025**:
+```bash
+# This command destroyed the production site:
+rsync -avz --delete frontend/dist/ ustfccca-web4:/home/web4ustfccca/public_html/iz/xcri/
+
+# Had to emergency restore:
+scp .htaccess ustfccca-web4:/home/web4ustfccca/public_html/iz/xcri/
+scp api-proxy.cgi ustfccca-web4:/home/web4ustfccca/public_html/iz/xcri/
+ssh ustfccca-web4 'chmod 755 /home/web4ustfccca/public_html/iz/xcri/api-proxy.cgi'
+```
+
+**Why this matters**:
+- The server is **NOT a git repository** - it's deployed via rsync
+- Frontend build output (`dist/`) doesn't contain backend files
+- `--delete` removes anything on server not in source directory
+- Results in immediate production outage
+
+**Correct deployment approach**:
+1. **Frontend only**: Use rsync WITHOUT `--delete` (updates frontend files only)
+2. **Backend only**: SSH to server, git pull, restart service
+3. **Both**: Do frontend rsync first, then backend git pull
+4. **Full deployment**: Use `./deployment/deploy.sh` which handles everything correctly
+
 ---
 
 ## Development Commands
