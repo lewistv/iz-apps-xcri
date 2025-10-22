@@ -537,7 +537,7 @@ function MainRankingsView() {
                   )}
                   {division === 2032 && (
                     <p className="qualification-note">
-                      <strong>NCAA D3 Rules</strong>: Performances must have occurred on or after September 28, {seasonYear}
+                      <strong>NCAA D3 Rules</strong>: Performances must have occurred on or after September 20, {seasonYear}
                       {' '}and been at least {gender === 'M' ? '7,000 meters (7K)' : '4,500 meters (4.5K)'} in distance.
                     </p>
                   )}
