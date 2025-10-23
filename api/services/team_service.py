@@ -7,12 +7,12 @@ Business logic for querying team rankings from database.
 import logging
 from typing import Optional, Tuple, List, Dict, Any
 
-from database import get_db_cursor, build_where_clause
+from database_async import get_db_cursor, build_where_clause
 
 logger = logging.getLogger(__name__)
 
 
-def get_teams(
+async def get_teams(
     season_year: int,
     division: Optional[int] = None,
     gender: Optional[str] = None,
@@ -44,7 +44,7 @@ def get_teams(
     Returns:
         Tuple of (results: List[Dict], total_count: int)
     """
-    with get_db_cursor() as cursor:
+    async with get_db_cursor() as cursor:
         # Build base WHERE clause
         where_sql, params = build_where_clause(
             season_year=season_year,
@@ -79,8 +79,8 @@ def get_teams(
             FROM iz_rankings_xcri_team_rankings
             WHERE {final_where}
         """
-        cursor.execute(count_sql, params)
-        total = cursor.fetchone()['total']
+        await cursor.execute(count_sql, params)
+        total = (await cursor.fetchone())['total']
 
         # Get results with pagination
         query_sql = f"""
@@ -118,8 +118,8 @@ def get_teams(
             ORDER BY team_rank
             LIMIT %s OFFSET %s
         """
-        cursor.execute(query_sql, params + [limit, offset])
-        results = cursor.fetchall()
+        await cursor.execute(query_sql, params + [limit, offset])
+        results = await cursor.fetchall()
 
         logger.info(
             f"Teams query: season={season_year}, division={division}, "
@@ -129,7 +129,7 @@ def get_teams(
         return results, total
 
 
-def get_team_by_id(
+async def get_team_by_id(
     team_hnd: int,
     season_year: int = 2024,
     division: Optional[int] = None,
@@ -155,7 +155,7 @@ def get_team_by_id(
     Returns:
         Team record dictionary or None if not found
     """
-    with get_db_cursor() as cursor:
+    async with get_db_cursor() as cursor:
         # Build WHERE clause
         where_sql, params = build_where_clause(
             season_year=season_year,
@@ -205,8 +205,8 @@ def get_team_by_id(
             ORDER BY calculated_at DESC
             LIMIT 1
         """
-        cursor.execute(query_sql, params)
-        result = cursor.fetchone()
+        await cursor.execute(query_sql, params)
+        result = await cursor.fetchone()
 
         if result:
             logger.info(

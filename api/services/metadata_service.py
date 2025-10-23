@@ -7,12 +7,12 @@ Business logic for querying calculation metadata from database.
 import logging
 from typing import Optional, List, Dict, Any
 
-from database import get_db_cursor
+from database_async import get_db_cursor
 
 logger = logging.getLogger(__name__)
 
 
-def get_metadata(
+async def get_metadata(
     season_year: int,
     division: Optional[int] = None,
     gender: Optional[str] = None,
@@ -34,7 +34,7 @@ def get_metadata(
     Returns:
         List of metadata records
     """
-    with get_db_cursor() as cursor:
+    async with get_db_cursor() as cursor:
         # Build WHERE clause
         where_clauses = ["season_year = %s"]
         params = [season_year]
@@ -91,8 +91,8 @@ def get_metadata(
             WHERE {where_sql}
             ORDER BY calculated_at DESC
         """
-        cursor.execute(query_sql, params)
-        results = cursor.fetchall()
+        await cursor.execute(query_sql, params)
+        results = await cursor.fetchall()
 
         logger.info(
             f"Metadata query: season={season_year}, division={division}, "
@@ -102,7 +102,7 @@ def get_metadata(
         return results
 
 
-def get_latest_metadata() -> List[Dict[str, Any]]:
+async def get_latest_metadata() -> List[Dict[str, Any]]:
     """
     Get the most recent calculation metadata for each division/gender combination.
 
@@ -111,7 +111,7 @@ def get_latest_metadata() -> List[Dict[str, Any]]:
     Returns:
         List of metadata records (one per division/gender)
     """
-    with get_db_cursor() as cursor:
+    async with get_db_cursor() as cursor:
         query_sql = """
             SELECT
                 m.metadata_id,
@@ -155,15 +155,15 @@ def get_latest_metadata() -> List[Dict[str, Any]]:
               AND m.scoring_group = 'division'
             ORDER BY m.division_code, m.gender_code
         """
-        cursor.execute(query_sql)
-        results = cursor.fetchall()
+        await cursor.execute(query_sql)
+        results = await cursor.fetchall()
 
         logger.info(f"Latest metadata query: found {len(results)} recent calculations")
 
         return results
 
 
-def get_metadata_by_id(metadata_id: int) -> Optional[Dict[str, Any]]:
+async def get_metadata_by_id(metadata_id: int) -> Optional[Dict[str, Any]]:
     """
     Get single metadata record by ID.
 
@@ -173,7 +173,7 @@ def get_metadata_by_id(metadata_id: int) -> Optional[Dict[str, Any]]:
     Returns:
         Metadata record or None if not found
     """
-    with get_db_cursor() as cursor:
+    async with get_db_cursor() as cursor:
         query_sql = """
             SELECT
                 metadata_id,
@@ -200,8 +200,8 @@ def get_metadata_by_id(metadata_id: int) -> Optional[Dict[str, Any]]:
             FROM iz_rankings_xcri_calculation_metadata
             WHERE metadata_id = %s
         """
-        cursor.execute(query_sql, [metadata_id])
-        result = cursor.fetchone()
+        await cursor.execute(query_sql, [metadata_id])
+        result = await cursor.fetchone()
 
         if result:
             logger.info(f"Metadata found: id={metadata_id}")
@@ -211,7 +211,40 @@ def get_metadata_by_id(metadata_id: int) -> Optional[Dict[str, Any]]:
         return result
 
 
-def get_processing_summary() -> Dict[str, Any]:
+async def get_latest_calculation_date() -> Optional[str]:
+    """
+    Get the most recent calculation date across all divisions/genders.
+
+    Optimized query for frontend date display - returns only the timestamp.
+    Uses simple ORDER BY + LIMIT instead of complex joins.
+
+    Returns:
+        ISO 8601 timestamp string or None if no calculations found
+    """
+    async with get_db_cursor() as cursor:
+        query_sql = """
+            SELECT calculated_at
+            FROM iz_rankings_xcri_calculation_metadata
+            WHERE checkpoint_date IS NULL
+              AND algorithm_type = 'light'
+              AND scoring_group = 'division'
+            ORDER BY calculated_at DESC
+            LIMIT 1
+        """
+        cursor.execute(query_sql)
+        result = cursor.fetchone()
+
+        if result:
+            # Return the timestamp as ISO string
+            calculated_at = result['calculated_at']
+            logger.info(f"Latest calculation date: {calculated_at}")
+            return calculated_at.isoformat() if hasattr(calculated_at, 'isoformat') else str(calculated_at)
+
+        logger.warning("No calculation metadata found")
+        return None
+
+
+async def get_processing_summary() -> Dict[str, Any]:
     """
     Get aggregate processing statistics across all calculations.
 
@@ -224,7 +257,7 @@ def get_processing_summary() -> Dict[str, Any]:
     Returns:
         Dictionary with summary statistics
     """
-    with get_db_cursor() as cursor:
+    async with get_db_cursor() as cursor:
         query_sql = """
             SELECT
                 COUNT(*) as total_calculations,

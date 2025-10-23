@@ -17,5 +17,7 @@ openpyxl>=3.1.0
 # HTTP client (for GitHub API integration)
 httpx>=0.25.0
 
-# Note: Database drivers (pymysql) are already in main requirements.txt
-# Import database connection from algorithms/shared/database_connection.py
+# Database drivers
+pymysql==1.1.0
+aiomysql==0.2.0
+cryptography==41.0.7  # Required by aiomysql for secure connections

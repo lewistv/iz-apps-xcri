@@ -7,12 +7,12 @@ Business logic for querying athlete rankings from database.
 import logging
 from typing import Optional, Tuple, List, Dict, Any
 
-from database import get_db_cursor, build_where_clause
+from database_async import get_db_cursor, build_where_clause
 
 logger = logging.getLogger(__name__)
 
 
-def get_athletes(
+async def get_athletes(
     season_year: int,
     division: Optional[int] = None,
     gender: Optional[str] = None,
@@ -46,7 +46,7 @@ def get_athletes(
     Returns:
         Tuple of (results: List[Dict], total_count: int)
     """
-    with get_db_cursor() as cursor:
+    async with get_db_cursor() as cursor:
         # Build base WHERE clause
         where_sql, params = build_where_clause(
             season_year=season_year,
@@ -102,8 +102,8 @@ def get_athletes(
                 AND COALESCE(a.checkpoint_date, '') = COALESCE(t.checkpoint_date, '')
             WHERE {final_where}
         """
-        cursor.execute(count_sql, params)
-        total = cursor.fetchone()['total']
+        await cursor.execute(count_sql, params)
+        total = (await cursor.fetchone())['total']
 
         # Get results with pagination (JOIN with team rankings for region/conference - Session 009D)
         query_sql = f"""
@@ -157,8 +157,8 @@ def get_athletes(
             ORDER BY a.athlete_rank
             LIMIT %s OFFSET %s
         """
-        cursor.execute(query_sql, params + [limit, offset])
-        results = cursor.fetchall()
+        await cursor.execute(query_sql, params + [limit, offset])
+        results = await cursor.fetchall()
 
         logger.info(
             f"Athletes query: season={season_year}, division={division}, "
@@ -168,7 +168,7 @@ def get_athletes(
         return results, total
 
 
-def get_athlete_by_id(
+async def get_athlete_by_id(
     athlete_hnd: int,
     season_year: int = 2024,
     division: Optional[int] = None,
@@ -194,7 +194,7 @@ def get_athlete_by_id(
     Returns:
         Athlete record dictionary or None if not found
     """
-    with get_db_cursor() as cursor:
+    async with get_db_cursor() as cursor:
         # Build WHERE clause
         where_sql, params = build_where_clause(
             season_year=season_year,
@@ -251,8 +251,8 @@ def get_athlete_by_id(
             ORDER BY calculated_at DESC
             LIMIT 1
         """
-        cursor.execute(query_sql, params)
-        result = cursor.fetchone()
+        await cursor.execute(query_sql, params)
+        result = await cursor.fetchone()
 
         if result:
             logger.info(
@@ -266,7 +266,7 @@ def get_athlete_by_id(
         return result
 
 
-def get_team_roster(
+async def get_team_roster(
     team_hnd: int,
     season_year: int = 2024,
     division: Optional[int] = None,
@@ -292,7 +292,7 @@ def get_team_roster(
     Returns:
         Tuple of (results: List[Dict], total_count: int)
     """
-    with get_db_cursor() as cursor:
+    async with get_db_cursor() as cursor:
         # Build WHERE clause
         where_sql, params = build_where_clause(
             season_year=season_year,
@@ -313,8 +313,8 @@ def get_team_roster(
             FROM iz_rankings_xcri_athlete_rankings
             WHERE {where_sql}
         """
-        cursor.execute(count_sql, params)
-        total = cursor.fetchone()['total']
+        await cursor.execute(count_sql, params)
+        total = (await cursor.fetchone())['total']
 
         # Get results ordered by rank
         query_sql = f"""
@@ -359,8 +359,8 @@ def get_team_roster(
             ORDER BY athlete_rank
             LIMIT %s
         """
-        cursor.execute(query_sql, params + [limit])
-        results = cursor.fetchall()
+        await cursor.execute(query_sql, params + [limit])
+        results = await cursor.fetchall()
 
         logger.info(
             f"Team roster query: team_hnd={team_hnd}, season={season_year}, "

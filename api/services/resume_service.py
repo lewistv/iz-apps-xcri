@@ -8,12 +8,12 @@ Session 004: Created for Issue #15 (Season Resume Integration)
 import logging
 from typing import Optional, Dict, Any
 
-from database import get_db_cursor
+from database_async import get_db_cursor
 
 logger = logging.getLogger(__name__)
 
 
-def get_team_resume(
+async def get_team_resume(
     anet_team_hnd: int,
     season_year: int = 2025,
     division_code: Optional[int] = None,
@@ -41,7 +41,7 @@ def get_team_resume(
             'updated_at': datetime
         }
     """
-    with get_db_cursor() as cursor:
+    async with get_db_cursor() as cursor:
         # Build WHERE clause
         # Map gender code (M/F) to gender_fk (1/2)
         gender_fk = None
@@ -78,8 +78,8 @@ def get_team_resume(
             ORDER BY r.updated_at DESC
             LIMIT 1
         """
-        cursor.execute(query_sql, params)
-        result = cursor.fetchone()
+        await cursor.execute(query_sql, params)
+        result = await cursor.fetchone()
 
         if result:
             logger.info(

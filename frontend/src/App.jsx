@@ -18,7 +18,7 @@ import FAQ from './pages/FAQ';
 import HowItWorks from './pages/HowItWorks';
 import Glossary from './pages/Glossary';
 import Feedback from './pages/Feedback';
-import { athletesAPI, teamsAPI, snapshotAPI } from './services/api';
+import { athletesAPI, teamsAPI, snapshotAPI, metadataAPI } from './services/api';
 import './App.css';
 
 /**
@@ -67,6 +67,9 @@ function MainRankingsView() {
   // Session 009C: Full dataset for client-side filtering
   const [fullDataset, setFullDataset] = useState([]);
 
+  // Session 007: Latest calculation date from metadata
+  const [latestCalculationDate, setLatestCalculationDate] = useState(null);
+
   // Debounce timer refs (Issue #8: Prevent overwhelming with rapid changes)
   const debounceTimerRef = useRef(null);  // For API calls (filter changes)
   const searchDebounceRef = useRef(null); // For search input
@@ -94,6 +97,30 @@ function MainRankingsView() {
       2052: 'NJCAA D3',
     };
     return divisions[divCode] || 'Unknown';
+  };
+
+  // Helper function to format calculation date in Eastern Time
+  // Session 007: Convert UTC timestamp to ET and format for display
+  const formatCalculationDate = (utcDateString) => {
+    if (!utcDateString) return null;
+
+    try {
+      // Parse the UTC timestamp (format: "2025-10-22T16:12:21")
+      const utcDate = new Date(utcDateString);
+
+      // Format in Eastern Time with proper options
+      const options = {
+        timeZone: 'America/New_York',
+        month: 'long',
+        day: 'numeric',
+        year: 'numeric',
+      };
+
+      return utcDate.toLocaleDateString('en-US', options);
+    } catch (err) {
+      console.error('Failed to format calculation date:', err);
+      return null;
+    }
   };
 
   // Update page title based on current view and filters
@@ -125,6 +152,41 @@ function MainRankingsView() {
 
     setSearchParams(params, { replace: true });
   }, [division, gender, view, region, conference, search]);
+
+  // Session 007: Fetch latest calculation date on component mount
+  // Optimization: Use sessionStorage to cache date and lightweight API endpoint
+  useEffect(() => {
+    const STORAGE_KEY = 'xcri_latest_calculation_date';
+
+    const fetchLatestCalculationDate = async () => {
+      try {
+        // Check sessionStorage first (lasts until browser tab closes)
+        const cachedDate = sessionStorage.getItem(STORAGE_KEY);
+        if (cachedDate) {
+          console.log('Using cached calculation date from sessionStorage');
+          setLatestCalculationDate(cachedDate);
+          return;
+        }
+
+        // Fetch from optimized API endpoint (single timestamp, not full metadata)
+        const response = await metadataAPI.latestDate();
+        if (response.data && response.data.calculated_at) {
+          const calculatedAt = response.data.calculated_at;
+
+          // Cache in sessionStorage for this browser session
+          sessionStorage.setItem(STORAGE_KEY, calculatedAt);
+
+          setLatestCalculationDate(calculatedAt);
+          console.log('Fetched and cached calculation date:', calculatedAt);
+        }
+      } catch (err) {
+        console.error('Failed to fetch latest calculation date:', err);
+        // Silently fail - we'll fall back to displaying without a date
+      }
+    };
+
+    fetchLatestCalculationDate();
+  }, []); // Run once on mount
 
   // Fetch data when filters change (Session 010: Server-side region/conference filtering)
   // Issue #8: Debounce to prevent overwhelming API with rapid filter changes
@@ -420,7 +482,9 @@ function MainRankingsView() {
         <p>
           {isHistorical && selectedSnapshot
             ? `Historical Rankings - ${selectedSnapshot}`
-            : 'Current Rankings - 2025 Season (as of October 20, 2025)'}
+            : latestCalculationDate
+              ? `Current Rankings - 2025 Season (as of ${formatCalculationDate(latestCalculationDate)})`
+              : 'Current Rankings - 2025 Season'}
         </p>
       </div>
 

@@ -111,7 +111,7 @@ async def list_athletes(
 ):
     """List athlete rankings with filters and pagination"""
     try:
-        results, total = athlete_service.get_athletes(
+        results, total = await athlete_service.get_athletes(
             season_year=season_year,
             division=division,
             gender=gender,
@@ -181,7 +181,7 @@ async def get_athlete(
 ):
     """Get single athlete by AthleticNet athlete handle"""
     try:
-        result = athlete_service.get_athlete_by_id(
+        result = await athlete_service.get_athlete_by_id(
             athlete_hnd=athlete_hnd,
             season_year=season_year,
             division=division,
@@ -257,7 +257,7 @@ async def get_team_roster(
 ):
     """Get team roster (all athletes on team)"""
     try:
-        results, total = athlete_service.get_team_roster(
+        results, total = await athlete_service.get_team_roster(
             team_hnd=team_hnd,
             season_year=season_year,
             division=division,

@@ -106,7 +106,7 @@ async def list_teams(
 ):
     """List team rankings with filters and pagination"""
     try:
-        results, total = team_service.get_teams(
+        results, total = await team_service.get_teams(
             season_year=season_year,
             division=division,
             gender=gender,
@@ -175,7 +175,7 @@ async def get_team(
 ):
     """Get single team by AthleticNet team handle"""
     try:
-        result = team_service.get_team_by_id(
+        result = await team_service.get_team_by_id(
             team_hnd=team_hnd,
             season_year=season_year,
             division=division,
@@ -238,7 +238,7 @@ async def get_team_resume(
 ):
     """Get season resume for a team"""
     try:
-        result = resume_service.get_team_resume(
+        result = await resume_service.get_team_resume(
             anet_team_hnd=team_hnd,
             season_year=season_year,
             division_code=division,

@@ -23,7 +23,13 @@ from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import JSONResponse
 
 from config import settings
-from database import validate_database_connection, get_table_counts
+from database import validate_database_connection as validate_database_connection_sync
+from database_async import (
+    create_pool,
+    close_pool,
+    validate_database_connection as validate_database_connection_async,
+    get_pool_status
+)
 from models import HealthCheckResponse, ErrorResponse
 from routes import athletes, teams, metadata, snapshots, scs, components, feedback
 
@@ -42,35 +48,51 @@ logger = logging.getLogger(__name__)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """
-    Application lifespan handler.
+    Application lifespan handler with async connection pooling.
 
     Startup:
+    - Create async database connection pool
     - Validate database connection
     - Check table record counts
     - Log configuration
 
     Shutdown:
+    - Close connection pool gracefully
     - Clean up resources
     """
     # Startup
     logger.info("=" * 60)
-    logger.info("XCRI Rankings API - Starting Up")
+    logger.info("XCRI Rankings API - Starting Up (Async Mode)")
     logger.info("=" * 60)
     logger.info(f"API Version: {settings.api_version}")
     logger.info(f"API Host: {settings.api_host}:{settings.api_port}")
     logger.info(f"CORS Origins: {settings.cors_origins_list}")
 
     try:
+        # Create async connection pool
+        config = {
+            'host': settings.database_host,
+            'port': settings.database_port,
+            'user': settings.database_user,
+            'password': settings.database_password,
+            'database': settings.database_name,
+        }
+        await create_pool(config, pool_size=10)
+
         # Validate database connection
-        validate_database_connection()
-        logger.info("✓ Database connection validated")
+        await validate_database_connection_async()
+        logger.info("✓ Async database connection pool validated")
+
+        # Log pool status
+        pool_status = get_pool_status()
+        logger.info(f"✓ Pool initialized: {pool_status['free']}/{pool_status['max_size']} connections ready")
 
     except Exception as e:
         logger.error(f"✗ Startup failed: {e}")
         raise
 
     logger.info("=" * 60)
-    logger.info("XCRI Rankings API - Ready")
+    logger.info("XCRI Rankings API - Ready (Async + Connection Pooling)")
     logger.info("=" * 60)
     logger.info(f"Swagger UI: http://{settings.api_host}:{settings.api_port}/docs")
     logger.info(f"ReDoc: http://{settings.api_host}:{settings.api_port}/redoc")
@@ -80,6 +102,8 @@ async def lifespan(app: FastAPI):
 
     # Shutdown
     logger.info("XCRI Rankings API - Shutting Down")
+    await close_pool()
+    logger.info("✓ Async connection pool closed")
 
 
 # ===================================================================

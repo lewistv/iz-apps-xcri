@@ -7,12 +7,12 @@ Business logic for querying SCS component breakdowns from database.
 import logging
 from typing import Optional, Dict, Any
 
-from database import get_db_cursor
+from database_async import get_db_cursor
 
 logger = logging.getLogger(__name__)
 
 
-def get_athlete_scs_components(
+async def get_athlete_scs_components(
     athlete_hnd: int,
     season_year: int = 2024,
     division: Optional[int] = None,
@@ -30,7 +30,7 @@ def get_athlete_scs_components(
     Returns:
         Dict with component scores and ranks, or None if not found
     """
-    with get_db_cursor() as cursor:
+    async with get_db_cursor() as cursor:
         # Build WHERE clause
         where_clauses = [
             "season_year = %s",
@@ -91,8 +91,8 @@ def get_athlete_scs_components(
             LIMIT 1
         """
 
-        cursor.execute(query_sql, params)
-        result = cursor.fetchone()
+        await cursor.execute(query_sql, params)
+        result = await cursor.fetchone()
 
         if result:
             logger.info(
@@ -106,7 +106,7 @@ def get_athlete_scs_components(
         return result
 
 
-def get_component_leaderboard(
+async def get_component_leaderboard(
     component: str,
     season_year: int = 2024,
     division: int = 2030,
@@ -135,7 +135,7 @@ def get_component_leaderboard(
     score_col = f"{component}_score"
     rank_col = f"{component}_rank"
 
-    with get_db_cursor() as cursor:
+    async with get_db_cursor() as cursor:
         # Build WHERE clause
         where_sql = """
             season_year = %s
@@ -151,8 +151,8 @@ def get_component_leaderboard(
             WHERE {where_sql}
               AND {rank_col} IS NOT NULL
         """
-        cursor.execute(count_sql, params)
-        total = cursor.fetchone()['total']
+        await cursor.execute(count_sql, params)
+        total = (await cursor.fetchone())['total']
 
         # Get results
         query_sql = f"""
@@ -178,8 +178,8 @@ def get_component_leaderboard(
             ORDER BY {rank_col}
             LIMIT %s
         """
-        cursor.execute(query_sql, params + [limit])
-        results = cursor.fetchall()
+        await cursor.execute(query_sql, params + [limit])
+        results = await cursor.fetchall()
 
         logger.info(
             f"Component leaderboard query: {component.upper()}, "
@@ -190,7 +190,7 @@ def get_component_leaderboard(
         return results, total
 
 
-def get_component_comparison(
+async def get_component_comparison(
     athlete_hnd: int,
     season_year: int = 2024,
     division: int = 2030,
@@ -208,7 +208,7 @@ def get_component_comparison(
     Returns:
         Dict with component scores, ranks, and context
     """
-    with get_db_cursor() as cursor:
+    async with get_db_cursor() as cursor:
         # Get athlete's component data
         athlete_sql = """
             SELECT
@@ -230,8 +230,8 @@ def get_component_comparison(
               AND gender_code = %s
               AND anet_athlete_hnd = %s
         """
-        cursor.execute(athlete_sql, [season_year, division, gender, athlete_hnd])
-        athlete_data = cursor.fetchone()
+        await cursor.execute(athlete_sql, [season_year, division, gender, athlete_hnd])
+        athlete_data = await cursor.fetchone()
 
         if not athlete_data:
             return None
@@ -244,8 +244,8 @@ def get_component_comparison(
               AND division_code = %s
               AND gender_code = %s
         """
-        cursor.execute(totals_sql, [season_year, division, gender])
-        totals = cursor.fetchone()
+        await cursor.execute(totals_sql, [season_year, division, gender])
+        totals = await cursor.fetchone()
         total_athletes = totals['total_athletes']
 
         # Calculate percentiles
@@ -317,7 +317,7 @@ def get_component_comparison(
         return result
 
 
-def get_component_distribution(
+async def get_component_distribution(
     component: str,
     season_year: int = 2024,
     division: int = 2030,
@@ -345,7 +345,7 @@ def get_component_distribution(
     component = component.lower()
     score_col = f"{component}_score"
 
-    with get_db_cursor() as cursor:
+    async with get_db_cursor() as cursor:
         # Get distribution statistics
         stats_sql = f"""
             SELECT
@@ -360,8 +360,8 @@ def get_component_distribution(
               AND gender_code = %s
               AND {score_col} IS NOT NULL
         """
-        cursor.execute(stats_sql, [season_year, division, gender])
-        stats = cursor.fetchone()
+        await cursor.execute(stats_sql, [season_year, division, gender])
+        stats = await cursor.fetchone()
 
         # Get percentiles (25th, 50th, 75th)
         # Note: MySQL doesn't have built-in PERCENTILE function, so we approximate
@@ -374,8 +374,8 @@ def get_component_distribution(
               AND {score_col} IS NOT NULL
             ORDER BY {score_col}
         """
-        cursor.execute(percentile_sql, [season_year, division, gender])
-        all_scores = [row[score_col] for row in cursor.fetchall()]
+        await cursor.execute(percentile_sql, [season_year, division, gender])
+        all_scores = [row[score_col] for row in await cursor.fetchall()]
 
         def get_percentile(scores, p):
             if not scores:

@@ -32,7 +32,7 @@ async def get_athlete_scs_components(
 
     **Example**: `/scs/athletes/12345678/components?season_year=2024&division=2030&gender=M`
     """
-    result = scs_service.get_athlete_scs_components(
+    result = await scs_service.get_athlete_scs_components(
         athlete_hnd=athlete_hnd,
         season_year=season_year,
         division=division,
@@ -68,7 +68,7 @@ async def get_component_leaderboard(
     **Example**: `/scs/leaderboard/saga?season_year=2024&division=2030&gender=M&limit=25`
     """
     try:
-        results, total = scs_service.get_component_leaderboard(
+        results, total = await scs_service.get_component_leaderboard(
             component=component,
             season_year=season_year,
             division=division,
@@ -105,7 +105,7 @@ async def get_athlete_component_comparison(
 
     **Example**: `/scs/athletes/12345678/comparison?season_year=2024&division=2030&gender=M`
     """
-    result = scs_service.get_component_comparison(
+    result = await scs_service.get_component_comparison(
         athlete_hnd=athlete_hnd,
         season_year=season_year,
         division=division,
@@ -144,7 +144,7 @@ async def get_component_distribution(
     **Example**: `/scs/distribution/sewr?season_year=2024&division=2030&gender=M`
     """
     try:
-        result = scs_service.get_component_distribution(
+        result = await scs_service.get_component_distribution(
             component=component,
             season_year=season_year,
             division=division,

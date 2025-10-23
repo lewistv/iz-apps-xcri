@@ -80,6 +80,13 @@ export const teamsAPI = {
 // Metadata API endpoints
 export const metadataAPI = {
   /**
+   * Get latest calculation date (optimized query)
+   * Session 007: Lightweight endpoint for date display
+   * @returns {Promise} API response with { calculated_at: "2025-10-22T16:12:21" }
+   */
+  latestDate: () => api.get('/metadata/latest/date'),
+
+  /**
    * Get latest calculation metadata for each division/gender
    * @returns {Promise} API response with latest metadata records
    */

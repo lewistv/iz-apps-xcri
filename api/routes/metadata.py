@@ -75,7 +75,7 @@ async def list_metadata(
 ):
     """List calculation metadata records"""
     try:
-        results = metadata_service.get_metadata(
+        results = await metadata_service.get_metadata(
             season_year=season_year,
             division=division,
             gender=gender,
@@ -98,6 +98,52 @@ async def list_metadata(
 
 
 @router.get(
+    "/latest/date",
+    summary="Get latest calculation date",
+    description="""
+    Get the most recent calculation timestamp (optimized query).
+
+    Returns only the timestamp, not full metadata. Optimized for frontend date display.
+
+    **Example:**
+    ```
+    GET /metadata/latest/date
+    ```
+
+    **Response:**
+    ```json
+    {
+      "calculated_at": "2025-10-22T16:12:21"
+    }
+    ```
+    """
+)
+async def get_latest_calculation_date():
+    """Get latest calculation date (optimized)"""
+    try:
+        calculated_at = await metadata_service.get_latest_calculation_date()
+
+        if not calculated_at:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="No calculation metadata found"
+            )
+
+        return {
+            "calculated_at": calculated_at
+        }
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error getting latest calculation date: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to retrieve latest calculation date: {str(e)}"
+        )
+
+
+@router.get(
     "/latest",
     response_model=MetadataListResponse,
     summary="Get latest calculations",
@@ -115,7 +161,7 @@ async def list_metadata(
 async def get_latest_metadata():
     """Get latest calculation metadata for each division/gender"""
     try:
-        results = metadata_service.get_latest_metadata()
+        results = await metadata_service.get_latest_metadata()
 
         return {
             "total": len(results),
@@ -146,7 +192,7 @@ async def get_latest_metadata():
 async def get_metadata_by_id(metadata_id: int):
     """Get single metadata record by ID"""
     try:
-        result = metadata_service.get_metadata_by_id(metadata_id)
+        result = await metadata_service.get_metadata_by_id(metadata_id)
 
         if not result:
             raise HTTPException(
@@ -187,7 +233,7 @@ async def get_metadata_by_id(metadata_id: int):
 async def get_processing_summary():
     """Get aggregate processing statistics"""
     try:
-        result = metadata_service.get_processing_summary()
+        result = await metadata_service.get_processing_summary()
 
         if not result:
             return {

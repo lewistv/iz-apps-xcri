@@ -44,7 +44,7 @@ router = APIRouter(
 async def list_snapshots():
     """List all available snapshot dates"""
     try:
-        snapshots = snapshot_service.list_snapshots()
+        snapshots = await snapshot_service.list_snapshots()
         return {
             "total": len(snapshots),
             "snapshots": snapshots
@@ -109,7 +109,7 @@ async def get_snapshot_athletes(
 ):
     """Get athlete rankings from a specific snapshot"""
     try:
-        results, total = snapshot_service.get_snapshot_athletes(
+        results, total = await snapshot_service.get_snapshot_athletes(
             snapshot_date=snapshot_date,
             division=division,
             gender=gender.upper(),
@@ -185,7 +185,7 @@ async def get_snapshot_teams(
 ):
     """Get team rankings from a specific snapshot"""
     try:
-        results, total = snapshot_service.get_snapshot_teams(
+        results, total = await snapshot_service.get_snapshot_teams(
             snapshot_date=snapshot_date,
             division=division,
             gender=gender.upper(),
@@ -233,7 +233,7 @@ async def get_snapshot_teams(
 async def get_snapshot_metadata(snapshot_date: str):
     """Get metadata for a specific snapshot"""
     try:
-        metadata = snapshot_service.get_snapshot_metadata(snapshot_date)
+        metadata = await snapshot_service.get_snapshot_metadata(snapshot_date)
 
         if metadata["status"] == "not_found":
             raise HTTPException(

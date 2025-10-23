@@ -6,7 +6,7 @@ Business logic for retrieving historical snapshot data from MySQL database.
 
 import logging
 from typing import List, Dict, Tuple, Optional
-from database import get_db_cursor
+from database_async import get_db_cursor
 
 logger = logging.getLogger(__name__)
 
@@ -18,7 +18,7 @@ class SnapshotService:
         """Initialize snapshot service"""
         pass
 
-    def list_snapshots(self) -> List[Dict]:
+    async def list_snapshots(self) -> List[Dict]:
         """
         List all available snapshot dates from MySQL.
 
@@ -28,7 +28,7 @@ class SnapshotService:
         snapshots = []
 
         try:
-            with get_db_cursor() as cursor:
+            async with get_db_cursor() as cursor:
                 query = """
                 SELECT
                     checkpoint_date as date,
@@ -43,8 +43,8 @@ class SnapshotService:
                 GROUP BY checkpoint_date, season_year
                 ORDER BY checkpoint_date DESC
                 """
-                cursor.execute(query, ["light", "division"])
-                results = cursor.fetchall()
+                await cursor.execute(query, ["light", "division"])
+                results = await cursor.fetchall()
 
                 for row in results:
                     snapshot_date = row['date'].strftime('%Y-%m-%d') if row['date'] else None
@@ -65,7 +65,7 @@ class SnapshotService:
             logger.error(f"Error listing snapshots from MySQL: {e}", exc_info=True)
             return []
 
-    def get_snapshot_athletes(
+    async def get_snapshot_athletes(
         self,
         snapshot_date: str,
         division: int,
@@ -89,7 +89,7 @@ class SnapshotService:
             Tuple of (athletes list, total count)
         """
         try:
-            with get_db_cursor() as cursor:
+            async with get_db_cursor() as cursor:
                 # Build base WHERE clause
                 where_clauses = [
                     "checkpoint_date = %s",
@@ -114,8 +114,8 @@ class SnapshotService:
                 FROM iz_rankings_xcri_athlete_rankings
                 WHERE {where_sql}
                 """
-                cursor.execute(count_query, params)
-                total = cursor.fetchone()['total']
+                await cursor.execute(count_query, params)
+                total = (await cursor.fetchone())['total']
 
                 # Get paginated results
                 data_query = f"""
@@ -142,8 +142,8 @@ class SnapshotService:
                 ORDER BY athlete_rank ASC
                 LIMIT %s OFFSET %s
                 """
-                cursor.execute(data_query, params + [limit, offset])
-                results = cursor.fetchall()
+                await cursor.execute(data_query, params + [limit, offset])
+                results = await cursor.fetchall()
 
                 athletes = [dict(row) for row in results]
                 logger.info(f"Loaded {len(athletes)} athletes from MySQL snapshot {snapshot_date}")
@@ -154,7 +154,7 @@ class SnapshotService:
             logger.error(f"Error reading snapshot {snapshot_date} from MySQL: {e}", exc_info=True)
             return [], 0
 
-    def get_snapshot_teams(
+    async def get_snapshot_teams(
         self,
         snapshot_date: str,
         division: int,
@@ -178,7 +178,7 @@ class SnapshotService:
             Tuple of (teams list, total count)
         """
         try:
-            with get_db_cursor() as cursor:
+            async with get_db_cursor() as cursor:
                 # Build base WHERE clause
                 where_clauses = [
                     "checkpoint_date = %s",
@@ -202,8 +202,8 @@ class SnapshotService:
                 FROM iz_rankings_xcri_team_rankings
                 WHERE {where_sql}
                 """
-                cursor.execute(count_query, params)
-                total = cursor.fetchone()['total']
+                await cursor.execute(count_query, params)
+                total = (await cursor.fetchone())['total']
 
                 # Get paginated results
                 data_query = f"""
@@ -224,8 +224,8 @@ class SnapshotService:
                 ORDER BY team_rank ASC
                 LIMIT %s OFFSET %s
                 """
-                cursor.execute(data_query, params + [limit, offset])
-                results = cursor.fetchall()
+                await cursor.execute(data_query, params + [limit, offset])
+                results = await cursor.fetchall()
 
                 teams = [dict(row) for row in results]
                 logger.info(f"Loaded {len(teams)} teams from MySQL snapshot {snapshot_date}")
@@ -236,7 +236,7 @@ class SnapshotService:
             logger.error(f"Error reading snapshot teams {snapshot_date} from MySQL: {e}", exc_info=True)
             return [], 0
 
-    def get_snapshot_metadata(self, snapshot_date: str) -> Dict:
+    async def get_snapshot_metadata(self, snapshot_date: str) -> Dict:
         """
         Get metadata for a specific snapshot from MySQL.
 
@@ -249,7 +249,7 @@ class SnapshotService:
         try:
             season = int(snapshot_date[:4])
 
-            with get_db_cursor() as cursor:
+            async with get_db_cursor() as cursor:
                 # Get divisions/genders available for this snapshot
                 query = """
                 SELECT
@@ -263,8 +263,8 @@ class SnapshotService:
                 GROUP BY division_code, gender_code
                 ORDER BY division_code, gender_code
                 """
-                cursor.execute(query, [snapshot_date, "light", "division"])
-                results = cursor.fetchall()
+                await cursor.execute(query, [snapshot_date, "light", "division"])
+                results = await cursor.fetchall()
 
                 if not results:
                     return {
