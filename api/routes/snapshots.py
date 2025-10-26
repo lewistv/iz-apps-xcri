@@ -72,10 +72,12 @@ async def list_snapshots():
     - limit: Results per page (default: 25, max: 500)
     - offset: Pagination offset
     - search: Search by athlete name or school name
+    - region: Filter by region name (optional)
+    - conference: Filter by conference name (optional)
 
     **Example:**
     ```
-    GET /snapshots/2024-11-25/athletes?division=2030&gender=M&limit=25
+    GET /snapshots/2024-11-25/athletes?division=2030&gender=M&limit=25&region=West
     ```
     """
 )
@@ -105,6 +107,14 @@ async def get_snapshot_athletes(
         default=None,
         description="Search by athlete name or school name",
         min_length=2
+    ),
+    region: Optional[str] = Query(
+        default=None,
+        description="Filter by region name"
+    ),
+    conference: Optional[str] = Query(
+        default=None,
+        description="Filter by conference name"
     )
 ):
     """Get athlete rankings from a specific snapshot"""
@@ -115,7 +125,9 @@ async def get_snapshot_athletes(
             gender=gender.upper(),
             limit=limit,
             offset=offset,
-            search=search
+            search=search,
+            region=region,
+            conference=conference
         )
 
         return {
@@ -148,10 +160,12 @@ async def get_snapshot_athletes(
     - limit: Results per page (default: 25, max: 500)
     - offset: Pagination offset
     - search: Search by team name
+    - region: Filter by region name (optional)
+    - conference: Filter by conference name (optional)
 
     **Example:**
     ```
-    GET /snapshots/2024-11-25/teams?division=2030&gender=M&limit=25
+    GET /snapshots/2024-11-25/teams?division=2030&gender=M&limit=25&region=West
     ```
     """
 )
@@ -181,6 +195,14 @@ async def get_snapshot_teams(
         default=None,
         description="Search by team name",
         min_length=2
+    ),
+    region: Optional[str] = Query(
+        default=None,
+        description="Filter by region name"
+    ),
+    conference: Optional[str] = Query(
+        default=None,
+        description="Filter by conference name"
     )
 ):
     """Get team rankings from a specific snapshot"""
@@ -191,7 +213,9 @@ async def get_snapshot_teams(
             gender=gender.upper(),
             limit=limit,
             offset=offset,
-            search=search
+            search=search,
+            region=region,
+            conference=conference
         )
 
         return {

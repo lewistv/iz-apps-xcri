@@ -28,7 +28,8 @@ from database_async import (
     create_pool,
     close_pool,
     validate_database_connection as validate_database_connection_async,
-    get_pool_status
+    get_pool_status,
+    get_table_counts
 )
 from models import HealthCheckResponse, ErrorResponse
 from routes import athletes, teams, metadata, snapshots, scs, components, feedback
@@ -178,7 +179,7 @@ async def root():
     """
     try:
         # Test database connection
-        table_counts = get_table_counts()
+        table_counts = await get_table_counts()
         db_connected = True
     except Exception as e:
         logger.error(f"Database health check failed: {e}")
@@ -213,7 +214,7 @@ async def health_check():
     """
     try:
         # Test database and get table counts
-        table_counts = get_table_counts()
+        table_counts = await get_table_counts()
         db_connected = True
 
         # Determine overall status

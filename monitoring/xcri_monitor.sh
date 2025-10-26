@@ -57,7 +57,40 @@ check_requirements() {
 }
 
 get_api_pid() {
-    pgrep -f "$API_PROCESS_NAME" | head -1
+    # Get the master uvicorn process (not the bash wrapper or workers)
+    ps aux | grep "uvicorn main:app --host 127.0.0.1 --port 8001" | grep -v grep | grep -v "bash -c" | head -1 | awk '{print $2}'
+}
+
+get_worker_count() {
+    # Count all Python processes related to uvicorn (master + workers)
+    # Includes: master, resource tracker, and spawned workers
+    ps aux | grep -E "(uvicorn main:app|multiprocessing.*spawn_main)" | grep -v grep | grep -v "bash -c" | wc -l
+}
+
+get_worker_stats() {
+    # Get all worker PIDs and their stats (including master and spawned workers)
+    local pids=$(ps aux | grep -E "(uvicorn main:app|multiprocessing.*spawn_main)" | grep -v grep | grep -v "bash -c" | awk '{print $2}')
+    local total_cpu=0
+    local total_mem=0
+    local count=0
+
+    while read -r pid; do
+        if [ -n "$pid" ]; then
+            local stats=$(ps -p "$pid" -o %cpu,rss 2>/dev/null | tail -1)
+            if [ -n "$stats" ]; then
+                local cpu=$(echo "$stats" | awk '{print $1}')
+                local mem_kb=$(echo "$stats" | awk '{print $2}')
+
+                total_cpu=$(echo "$total_cpu + $cpu" | bc)
+                total_mem=$((total_mem + mem_kb))
+                ((count++))
+            fi
+        fi
+    done <<< "$pids"
+
+    local avg_mem_mb=$(echo "scale=1; $total_mem / 1024" | bc)
+
+    echo "$count|$total_cpu|$avg_mem_mb"
 }
 
 get_api_health() {
@@ -167,11 +200,12 @@ display_header() {
 
 display_api_status() {
     local pid=$(get_api_pid)
+    local worker_count=$(get_worker_count)
     local health=$(get_api_health)
     local status=$(echo "$health" | cut -d'|' -f1)
     local response_time=$(echo "$health" | cut -d'|' -f2)
 
-    echo -e "\n${CYAN}📊 API Status${NC}"
+    echo -e "\n${CYAN}📊 API Status (Async + Multi-Worker)${NC}"
     echo "----------------------------------------"
 
     if [ "$status" = "HEALTHY" ]; then
@@ -182,30 +216,36 @@ display_api_status() {
     fi
 
     if [ -n "$pid" ]; then
+        local worker_stats=$(get_worker_stats)
+        local count=$(echo "$worker_stats" | cut -d'|' -f1)
+        local total_cpu=$(echo "$worker_stats" | cut -d'|' -f2)
+        local total_mem=$(echo "$worker_stats" | cut -d'|' -f3)
+
+        # Show process info
         local stats=$(get_process_stats "$pid")
-        local cpu=$(echo "$stats" | cut -d'|' -f1)
-        local mem=$(echo "$stats" | cut -d'|' -f2)
         local uptime=$(echo "$stats" | cut -d'|' -f3)
 
-        echo "PID:            $pid"
+        echo "Master PID:     $pid"
+        echo "Workers:        $count processes"
         echo "Uptime:         $uptime"
+        echo "Architecture:   Async + Connection Pool (10 conn/worker)"
 
         # Color code CPU usage
-        if (( $(echo "$cpu > 80" | bc -l) )); then
-            echo -e "CPU Usage:      ${RED}${cpu}%${NC}"
-        elif (( $(echo "$cpu > 50" | bc -l) )); then
-            echo -e "CPU Usage:      ${YELLOW}${cpu}%${NC}"
+        if (( $(echo "$total_cpu > 80" | bc -l) )); then
+            echo -e "Total CPU:      ${RED}${total_cpu}%${NC}"
+        elif (( $(echo "$total_cpu > 50" | bc -l) )); then
+            echo -e "Total CPU:      ${YELLOW}${total_cpu}%${NC}"
         else
-            echo -e "CPU Usage:      ${GREEN}${cpu}%${NC}"
+            echo -e "Total CPU:      ${GREEN}${total_cpu}%${NC}"
         fi
 
         # Color code memory usage
-        if (( $(echo "$mem > 200" | bc -l) )); then
-            echo -e "Memory:         ${RED}${mem} MB${NC}"
-        elif (( $(echo "$mem > 100" | bc -l) )); then
-            echo -e "Memory:         ${YELLOW}${mem} MB${NC}"
+        if (( $(echo "$total_mem > 500" | bc -l) )); then
+            echo -e "Total Memory:   ${RED}${total_mem} MB${NC}"
+        elif (( $(echo "$total_mem > 300" | bc -l) )); then
+            echo -e "Total Memory:   ${YELLOW}${total_mem} MB${NC}"
         else
-            echo -e "Memory:         ${GREEN}${mem} MB${NC}"
+            echo -e "Total Memory:   ${GREEN}${total_mem} MB${NC}"
         fi
     else
         echo -e "${RED}Process not found!${NC}"

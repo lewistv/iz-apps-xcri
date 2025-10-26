@@ -231,8 +231,8 @@ async def get_latest_calculation_date() -> Optional[str]:
             ORDER BY calculated_at DESC
             LIMIT 1
         """
-        cursor.execute(query_sql)
-        result = cursor.fetchone()
+        await cursor.execute(query_sql)
+        result = await cursor.fetchone()
 
         if result:
             # Return the timestamp as ISO string

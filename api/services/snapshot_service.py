@@ -72,7 +72,9 @@ class SnapshotService:
         gender: str,
         limit: int = 25,
         offset: int = 0,
-        search: Optional[str] = None
+        search: Optional[str] = None,
+        region: Optional[str] = None,
+        conference: Optional[str] = None
     ) -> Tuple[List[Dict], int]:
         """
         Get athlete rankings from a specific snapshot via MySQL.
@@ -84,6 +86,8 @@ class SnapshotService:
             limit: Maximum results to return
             offset: Pagination offset
             search: Optional search term for athlete/school name
+            region: Optional filter by region name
+            conference: Optional filter by conference name
 
         Returns:
             Tuple of (athletes list, total count)
@@ -105,6 +109,16 @@ class SnapshotService:
                     where_clauses.append("(athlete_name_first LIKE %s OR athlete_name_last LIKE %s OR team_name LIKE %s)")
                     search_pattern = f"%{search}%"
                     params.extend([search_pattern, search_pattern, search_pattern])
+
+                # Add region filter if provided
+                if region:
+                    where_clauses.append("regl_group_name = %s")
+                    params.append(region)
+
+                # Add conference filter if provided
+                if conference:
+                    where_clauses.append("conf_group_name = %s")
+                    params.append(conference)
 
                 where_sql = " AND ".join(where_clauses)
 
@@ -161,7 +175,9 @@ class SnapshotService:
         gender: str,
         limit: int = 25,
         offset: int = 0,
-        search: Optional[str] = None
+        search: Optional[str] = None,
+        region: Optional[str] = None,
+        conference: Optional[str] = None
     ) -> Tuple[List[Dict], int]:
         """
         Get team rankings from a specific snapshot via MySQL.
@@ -173,6 +189,8 @@ class SnapshotService:
             limit: Maximum results to return
             offset: Pagination offset
             search: Optional search term for team name
+            region: Optional filter by region name
+            conference: Optional filter by conference name
 
         Returns:
             Tuple of (teams list, total count)
@@ -193,6 +211,16 @@ class SnapshotService:
                 if search:
                     where_clauses.append("team_name LIKE %s")
                     params.append(f"%{search}%")
+
+                # Add region filter if provided
+                if region:
+                    where_clauses.append("regl_group_name = %s")
+                    params.append(region)
+
+                # Add conference filter if provided
+                if conference:
+                    where_clauses.append("conf_group_name = %s")
+                    params.append(conference)
 
                 where_sql = " AND ".join(where_clauses)
 
