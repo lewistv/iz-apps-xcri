@@ -32,7 +32,7 @@ from database_async import (
     get_table_counts
 )
 from models import HealthCheckResponse, ErrorResponse
-from routes import athletes, teams, metadata, snapshots, scs, components, feedback
+from routes import athletes, teams, team_five, metadata, snapshots, scs, components, feedback
 
 # Configure logging
 logging.basicConfig(
@@ -246,6 +246,7 @@ async def health_check():
 
 app.include_router(athletes.router)
 app.include_router(teams.router)
+app.include_router(team_five.router)  # Session 013: Team Five Rankings API (copy of teams)
 app.include_router(metadata.router)
 app.include_router(snapshots.router)
 app.include_router(scs.router)  # Frontend Session 004: SCS component endpoints
