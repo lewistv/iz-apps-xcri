@@ -2,7 +2,7 @@
 XCRI Rankings API - Main Application
 
 FastAPI backend for NCAA Cross Country Rankings (XCRI).
-Provides REST API access to athlete and team rankings from web4 database.
+Provides REST API access to athlete and team five rankings from web4 database.
 
 Run with:
     uvicorn main:app --reload --host 0.0.0.0 --port 8000

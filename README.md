@@ -19,7 +19,7 @@ Display-only web interface for USTFCCCA Cross Country Running Index (XCRI) Ranki
 - MySQL (web4ustfccca_iz)
 - Read-only user: web4ustfccca_public
 - 418,000+ athlete rankings
-- 36,000+ team rankings
+- 36,000+ team five rankings
 - 14 division/gender combinations
 - 13 historical snapshots (2024-2025 seasons)
 

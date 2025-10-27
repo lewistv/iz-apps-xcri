@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import RankingsTable from './RankingsTable';
 
 /**
- * Team Rankings Table Component
+ * Team Five Rankings Table Component
  *
  * Wrapper around unified RankingsTable for team-specific display.
  * Columns: XCRI Rank | Team | Team Score (integer) | Region | Conference
@@ -32,7 +32,7 @@ export default function TeamTable({ teams, loading, isHistorical = false }) {
   };
 
   /**
-   * Column configuration for team rankings
+   * Column configuration for team five rankings
    * Order: XCRI Rank | Team | Team Score | Region | Conference
    */
   const columns = [

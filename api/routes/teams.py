@@ -1,7 +1,7 @@
 """
-XCRI Rankings API - Team Routes
+XCRI Rankings API - Team Five Rankings Routes
 
-FastAPI routes for team ranking endpoints.
+FastAPI routes for team five ranking endpoints.
 """
 
 import logging
@@ -32,9 +32,9 @@ router = APIRouter(
 @router.get(
     "/",
     response_model=TeamListResponse,
-    summary="List team rankings",
+    summary="List team five rankings",
     description="""
-    Get paginated list of team rankings with optional filters.
+    Get paginated list of team five rankings with optional filters.
 
     **Filters:**
     - division: Filter by NCAA division (2030=D1, 2031=D2, 2032=D3, 2028=NAIA)
@@ -104,7 +104,7 @@ async def list_teams(
         description="Filter by conference name"
     )
 ):
-    """List team rankings with filters and pagination"""
+    """List team five rankings with filters and pagination"""
     try:
         results, total = await team_service.get_teams(
             season_year=season_year,
@@ -131,7 +131,7 @@ async def list_teams(
         logger.error(f"Error listing teams: {e}", exc_info=True)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to retrieve team rankings: {str(e)}"
+            detail=f"Failed to retrieve team five rankings: {str(e)}"
         )
 
 

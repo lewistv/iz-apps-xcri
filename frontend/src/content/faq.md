@@ -103,9 +103,9 @@ The **Knockout Algorithm** uses a top-down selection approach to build rankings.
 
 ---
 
-## FAQ 4: How are Team Rankings Calculated?
+## FAQ 4: How are Team Five Rankings Calculated?
 
-Team rankings are based on the **top 7 athletes** from each team, following NCAA cross country scoring rules. This section explains how team scores are calculated and what factors contribute to team rankings.
+Team Five Rankings are based on the **top 5 athletes** from each team, following NCAA cross country scoring rules. This section explains how team scores are calculated and what factors contribute to team five rankings.
 
 ### Calculation Method
 
@@ -122,7 +122,7 @@ For each team, the algorithm identifies the top 7 athletes based on their indivi
 
 #### **Calculate Team Score**
 
-The team score is calculated by **summing the XCRI ranks** of the top 5 athletes. Lower total score \= better team ranking.
+The team score is calculated by **summing the XCRI ranks** of the top 5 athletes. Lower total score \= better Team Five ranking.
 
 **Example**:
 
@@ -580,22 +580,22 @@ Some ranking systems use:
 
 ---
 
-## FAQ 9: Do Team Rankings Consider Head-to-Head Team Results?
+## FAQ 9: Do Team Five Rankings Consider Head-to-Head Team Results?
 
-**No**. Team rankings are based **solely on individual athlete XCRI placements**, not head-to-head team results.
+**No**. Team Five Rankings are based **solely on individual athlete XCRI placements**, not head-to-head team results.
 
-### How Team Rankings Work
+### How Team Five Rankings Work
 
-Team rankings use the **top 7 athletes** from each team:
+Team Five Rankings use the **top 5 athletes** from each team:
 
 1. Each athlete has an individual XCRI score and rank  
 2. Team score \= Sum of top 5 athletes' XCRI scores
 
 ### What This Means
 
-**Team A beats Team B at a meet** does NOT directly affect team rankings.
+**Team A beats Team B at a meet** does NOT directly affect Team Five Rankings.
 
-Instead, XCRI rankings reflect:
+Instead, XCRI Team Five Rankings reflect:
 
 - Individual athlete performance across the entire season  
 - Squad depth (quality of top 7 athletes)  
@@ -618,9 +618,9 @@ Instead, XCRI rankings reflect:
 - Reflect squad depth accurately  
 - Less affected by single-meet anomalies
 
-**Example**: Team A might beat Team B at a major invitational, but if Team B's athletes have stronger individual seasons overall (better head-to-head records, tougher competition faced), Team B could rank higher in XCRI team rankings.
+**Example**: Team A might beat Team B at a major invitational, but if Team B's athletes have stronger individual seasons overall (better head-to-head records, tougher competition faced), Team B could rank higher in XCRI Team Five Rankings.
 
-**Bottom Line**: Team rankings aggregate individual athlete quality, not direct team-vs-team results.
+**Bottom Line**: Team Five Rankings aggregate individual athlete quality, not direct team-vs-team results.
 
 ---
 

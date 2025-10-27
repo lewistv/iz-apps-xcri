@@ -155,9 +155,9 @@ Despite being secondary, SCS is valuable:
 
 ---
 
-## How Team Rankings Work
+## How Team Five Rankings Work
 
-**Simple Version**: Add up the ranks of your top 7 athletes. Lowest total wins.
+**Simple Version**: Add up the ranks of your top 5 athletes. Lowest total wins.
 
 ### NCAA Cross Country Team Scoring
 
@@ -169,10 +169,10 @@ Despite being secondary, SCS is valuable:
 
 **Example**:
 
-- **Team Harvard**: Individual ranks 1, 15, 42, 68, 95, 112, 140  
+- **Team Harvard**: Individual ranks 1, 15, 42, 68, 95, 112, 140
 - **Team Score**: 1 \+ 15 \+ 42 \+ 68 \+ 95 \= **221**
 
-Lower score \= better team ranking.
+Lower score \= better Team Five ranking.
 
 ### What Makes a Great Team?
 

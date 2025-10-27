@@ -170,7 +170,7 @@ Comprehensive guide to technical terms used in the XCRI (Cross Country Rating In
 
 ### Team Score
 
-**Definition**: Sum of top 5 athletes' individual XCRI ranks. **How it works**: Lower total \= better team ranking **Example**: Ranks 1+15+42+68+95 \= Score of 221
+**Definition**: Sum of top 5 athletes' individual XCRI ranks. **How it works**: Lower total \= better Team Five ranking **Example**: Ranks 1+15+42+68+95 \= Score of 221
 
 ---
 

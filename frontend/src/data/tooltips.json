@@ -81,12 +81,12 @@
     },
     "team_rankings": {
       "team_rank": {
-        "text": "Overall team ranking based on sum of top 7 athletes' individual XCRI ranks.",
+        "text": "Overall Team Five ranking based on sum of top 5 athletes' individual XCRI ranks.",
         "placement": "top",
         "trigger": "hover"
       },
       "team_score": {
-        "text": "Sum of top 7 athletes' XCRI ranks. Lower score is better (e.g., ranks 1+5+10+15+20+25+30 = 106).",
+        "text": "Sum of top 5 athletes' XCRI ranks. Lower score is better (e.g., ranks 1+5+10+15+20 = 51).",
         "placement": "top",
         "trigger": "hover"
       },

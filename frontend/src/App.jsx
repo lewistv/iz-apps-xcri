@@ -23,7 +23,7 @@ import './App.css';
 
 /**
  * Main XCRI Rankings Application
- * Displays athlete and team rankings with filtering, search, and pagination
+ * Displays athlete and team five rankings with filtering, search, and pagination
  *
  * Data Sources:
  * - Current Rankings: MySQL database (has athlete handles, full SCS support)
@@ -618,17 +618,17 @@ function MainRankingsView() {
             ) : (
               <>
                 <ExplainerBox
-                  title="How are Team Rankings Calculated?"
+                  title="How are Team Five Rankings Calculated?"
                   links={[{ text: "Team Scoring FAQ", href: "/faq#faq-9-do-team-rankings-consider-head-to-head-team-results" }]}
                 >
                   <p>
-                    Team rankings follow <strong>NCAA cross country scoring rules</strong>: Up to 7 athletes
+                    Team Five Rankings follow <strong>NCAA cross country scoring rules</strong>: Up to 7 athletes
                     from each team can earn a score, but only the <strong>top 5 athletes' ranks are added
                     together</strong> to calculate the team's score. Lower team scores are better (like in XC meets).
                     Teams are then ranked by their team score.
                   </p>
                   <p>
-                    <strong>Important</strong>: Team rankings are based solely on <strong>individual athlete
+                    <strong>Important</strong>: Team Five Rankings are based solely on <strong>individual athlete
                     XCRI rankings</strong>. Head-to-head team results (e.g., which team won at a specific meet)
                     are <strong>not</strong> a factor. This ensures rankings reflect overall squad depth and
                     quality, not single-meet outcomes.
