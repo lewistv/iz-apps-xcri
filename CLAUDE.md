@@ -23,18 +23,27 @@ This file provides guidance to Claude Code when working with the XCRI Rankings w
 **API URL**: https://web4.ustfccca.org/iz/xcri/api/
 **GitHub Issues**: https://github.com/lewistv/iz-apps-xcri/issues
 
-**Completion Rate**: 100% (21 of 21 issues closed) 🎉
+**Completion Rate**: 100% (22 of 22 issues closed) 🎉
 **Analytics**: ✅ Google Analytics (G-FBG8Y8ZSTW) tracking enabled
 **Monitoring**: ✅ Real-time monitoring dashboard deployed
 
-**Recent Session (016)**: Server restart and Team Knockout deployment verification
+**Recent Session (017)**: Team Knockout matchups endpoint bug fix
+- ✅ Fixed HTTP 422 validation error (route ordering + SQL ambiguity)
+- ✅ All 6 Team Knockout endpoints operational (100% success rate)
+- ✅ Root cause #1: /{team_id} route defined before /matchups route
+- ✅ Root cause #2: SQL WHERE clause missing table aliases (m. prefix)
+- ✅ Changes deployed and API restarted successfully
+- ✅ GitHub Issue #24 closed, Issue #23 updated
+- ✅ Team Knockout backend 100% complete
+
+**Previous Session (016)**: Server restart and Team Knockout deployment verification
 - ✅ Maintenance mode implementation for user-friendly updates
 - ✅ API server restarted with 4 workers (1 parent + 4 workers = 5 processes)
 - ✅ Fixed 3 SQL bugs (ambiguous column references in WHERE clauses)
 - ✅ 5/6 Team Knockout endpoints operational (83% success rate)
 - ✅ Comprehensive agent documentation created (API_RESTART_GUIDE.md)
 - ✅ Updated restart script to use --workers 4
-- ⚠️ 1 endpoint deferred: matchups history (422 validation error - Session 017)
+- ⚠️ 1 endpoint deferred: matchups history (422 validation error - FIXED in Session 017)
 
 **Previous Session (015)**: Team Knockout matchup API implementation
 - ✅ Backend API complete: 6 endpoints, 7 service functions, 10 models
@@ -63,10 +72,11 @@ This file provides guidance to Claude Code when working with the XCRI Rankings w
 - ✅ Issue #10: Shared USTFCCCA header integration
 - ✅ Issue #6: Systemd service investigation (adopted manual startup)
 
-**Next Session (017)**: Team Knockout matchups endpoint debug
-- Fix 422 validation error in /team-knockout/matchups endpoint
-- Investigate Pydantic response model mismatch
-- Complete Team Knockout API to 100% operational status
+**Next Session**: Team Knockout frontend UI implementation
+- Implement Team Knockout rankings display components
+- Create matchup history tables and H2H comparison views
+- Add meet matchup analysis and common opponent displays
+- Extensive component work (estimated 4-6 hours)
 
 ---
 
