@@ -223,27 +223,27 @@ async def get_team_matchups(
         stats includes: total_matchups, wins, losses, win_pct
     """
     async with get_db_cursor() as cursor:
-        # Build WHERE clause
+        # Build WHERE clause (use m. alias for JOINs)
         where_clauses = [
-            "(team_a_id = %s OR team_b_id = %s)",
-            "season_year = %s",
-            "rank_group_type = %s"
+            "(m.team_a_id = %s OR m.team_b_id = %s)",
+            "m.season_year = %s",
+            "m.rank_group_type = %s"
         ]
         params = [team_id, team_id, season_year, rank_group_type]
 
         if rank_group_fk is not None:
-            where_clauses.append("rank_group_fk = %s")
+            where_clauses.append("m.rank_group_fk = %s")
             params.append(rank_group_fk)
 
         if gender_code:
-            where_clauses.append("gender_code = %s")
+            where_clauses.append("m.gender_code = %s")
             params.append(gender_code.upper())
 
         if checkpoint_date:
-            where_clauses.append("checkpoint_date = %s")
+            where_clauses.append("m.checkpoint_date = %s")
             params.append(checkpoint_date)
         else:
-            where_clauses.append("checkpoint_date IS NULL")
+            where_clauses.append("m.checkpoint_date IS NULL")
 
         where_sql = " AND ".join(where_clauses)
 
@@ -251,14 +251,14 @@ async def get_team_matchups(
         stats_sql = f"""
             SELECT
                 COUNT(*) as total_matchups,
-                SUM(CASE WHEN winner_team_id = %s THEN 1 ELSE 0 END) as wins,
-                SUM(CASE WHEN winner_team_id != %s THEN 1 ELSE 0 END) as losses,
+                SUM(CASE WHEN m.winner_team_id = %s THEN 1 ELSE 0 END) as wins,
+                SUM(CASE WHEN m.winner_team_id != %s THEN 1 ELSE 0 END) as losses,
                 ROUND(
-                    SUM(CASE WHEN winner_team_id = %s THEN 1 ELSE 0 END) * 100.0 /
+                    SUM(CASE WHEN m.winner_team_id = %s THEN 1 ELSE 0 END) * 100.0 /
                     NULLIF(COUNT(*), 0),
                     1
                 ) as win_pct
-            FROM iz_rankings_xcri_team_knockout_matchups
+            FROM iz_rankings_xcri_team_knockout_matchups m
             WHERE {where_sql}
         """
         await cursor.execute(stats_sql, [team_id, team_id, team_id] + params)

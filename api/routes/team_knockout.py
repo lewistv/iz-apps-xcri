@@ -134,72 +134,6 @@ async def list_team_knockout_rankings(
         )
 
 
-@router.get(
-    "/{team_id}",
-    response_model=TeamKnockoutRanking,
-    summary="Get Team Knockout ranking by team ID",
-    description="""
-    Get a single team's Team Knockout ranking by team identifier.
-
-    Returns the team's H2H-based ranking with elimination method details.
-
-    **Example:**
-    ```
-    GET /team-knockout/20690?season_year=2025&rank_group_type=D&rank_group_fk=2030&gender_code=M
-    ```
-    """
-)
-async def get_team_knockout_ranking(
-    team_id: int = Path(..., description="Team identifier (anet_team_hnd)"),
-    season_year: int = Query(default=2025, description="Season year"),
-    rank_group_type: str = Query(
-        default="D",
-        description="Ranking group type (D=Division, R=Regional, C=Conference)",
-        pattern="^[DRC]$"
-    ),
-    rank_group_fk: Optional[int] = Query(
-        default=None,
-        description="Ranking group ID (optional, for disambiguation)"
-    ),
-    gender_code: Optional[str] = Query(
-        default=None,
-        description="Gender code (optional, for disambiguation)",
-        pattern="^[MFmf]$"
-    ),
-    checkpoint_date: Optional[str] = Query(
-        default=None,
-        description="Rankings as of date (YYYY-MM-DD), null for LIVE"
-    )
-):
-    """Get single Team Knockout ranking by team ID"""
-    try:
-        result = await team_knockout_service.get_team_knockout_by_id(
-            team_id=team_id,
-            season_year=season_year,
-            rank_group_type=rank_group_type,
-            rank_group_fk=rank_group_fk,
-            gender_code=gender_code,
-            checkpoint_date=checkpoint_date
-        )
-
-        if not result:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Team Knockout ranking not found for team_id={team_id}"
-            )
-
-        return result
-
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"Error getting Team Knockout ranking for team_id={team_id}: {e}", exc_info=True)
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to retrieve Team Knockout ranking: {str(e)}"
-        )
-
-
 # ===================================================================
 # Matchup Endpoints
 # ===================================================================
@@ -519,4 +453,74 @@ async def get_common_opponents(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to retrieve common opponents: {str(e)}"
+        )
+
+
+# ===================================================================
+# Single Team Ranking Endpoint (MUST BE LAST - parameterized route)
+# ===================================================================
+
+@router.get(
+    "/{team_id}",
+    response_model=TeamKnockoutRanking,
+    summary="Get Team Knockout ranking by team ID",
+    description="""
+    Get a single team's Team Knockout ranking by team identifier.
+
+    Returns the team's H2H-based ranking with elimination method details.
+
+    **Example:**
+    ```
+    GET /team-knockout/20690?season_year=2025&rank_group_type=D&rank_group_fk=2030&gender_code=M
+    ```
+    """
+)
+async def get_team_knockout_ranking(
+    team_id: int = Path(..., description="Team identifier (anet_team_hnd)"),
+    season_year: int = Query(default=2025, description="Season year"),
+    rank_group_type: str = Query(
+        default="D",
+        description="Ranking group type (D=Division, R=Regional, C=Conference)",
+        pattern="^[DRC]$"
+    ),
+    rank_group_fk: Optional[int] = Query(
+        default=None,
+        description="Ranking group ID (optional, for disambiguation)"
+    ),
+    gender_code: Optional[str] = Query(
+        default=None,
+        description="Gender code (optional, for disambiguation)",
+        pattern="^[MFmf]$"
+    ),
+    checkpoint_date: Optional[str] = Query(
+        default=None,
+        description="Rankings as of date (YYYY-MM-DD), null for LIVE"
+    )
+):
+    """Get single Team Knockout ranking by team ID"""
+    try:
+        result = await team_knockout_service.get_team_knockout_by_id(
+            team_id=team_id,
+            season_year=season_year,
+            rank_group_type=rank_group_type,
+            rank_group_fk=rank_group_fk,
+            gender_code=gender_code,
+            checkpoint_date=checkpoint_date
+        )
+
+        if not result:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Team Knockout ranking not found for team_id={team_id}"
+            )
+
+        return result
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error getting Team Knockout ranking for team_id={team_id}: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to retrieve Team Knockout ranking: {str(e)}"
         )
