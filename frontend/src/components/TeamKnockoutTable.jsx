@@ -79,9 +79,7 @@ export default function TeamKnockoutTable({
       id: 'team',
       label: 'Team',
       field: 'team_name',
-      clickable: true,
-      onClick: handleTeamClick,
-      clickTitle: 'View team roster and details',
+      clickable: false,  // Disabled until Team Knockout team profiles are implemented
       className: 'nowrap',
     },
     {
@@ -111,19 +109,19 @@ export default function TeamKnockoutTable({
     },
     {
       id: 'team_five_rank',
-      label: 'TF Rank',
+      label: 'Team Five Rk',
       field: 'team_five_rank',
       format: (value) => value || '-',
-      className: 'text-center',
+      className: 'text-center nowrap',
       tooltip: 'Traditional Team Five ranking for comparison',
     },
     {
-      id: 'team_size',
-      label: 'Size',
-      field: 'team_size',
-      format: (value) => value || '-',
-      className: 'text-center',
-      tooltip: 'Number of athletes on team roster',
+      id: 'latest_race',
+      label: 'Latest Race',
+      field: 'most_recent_race_date',
+      format: (value) => value ? new Date(value).toLocaleDateString('en-US', { month: 'numeric', day: 'numeric' }) : '-',
+      className: 'text-center nowrap',
+      tooltip: 'Date of team\'s most recent race',
     },
   ];
 

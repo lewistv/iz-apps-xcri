@@ -77,6 +77,9 @@ export default function HeadToHeadModal({
         {/* Header */}
         <div className="modal-header">
           <h2>Head-to-Head Comparison</h2>
+          <div className="modal-subheader">
+            {teamA.season_year || 2025} {teamA.gender_code === 'M' ? "Men's" : "Women's"} Cross Country
+          </div>
           <button className="close-btn" onClick={onClose} aria-label="Close modal">
             ×
           </button>
@@ -222,8 +225,8 @@ export default function HeadToHeadModal({
                 </div>
               )}
 
-              {/* Common Opponents Link */}
-              {onCommonOpponentsClick && h2hData.total_matchups >= 0 && (
+              {/* Common Opponents Link - Hidden until feature is implemented */}
+              {false && onCommonOpponentsClick && h2hData.total_matchups >= 0 && (
                 <div className="common-opponents-section">
                   <button
                     className="common-opponents-btn"

@@ -675,8 +675,9 @@ function MainRankingsView() {
                   <p>
                     <strong>Important</strong>: Team Five Rankings are based solely on <strong>individual athlete
                     XCRI rankings</strong>. Head-to-head team results (e.g., which team won at a specific meet)
-                    are <strong>not</strong> a factor. This ensures rankings reflect overall squad depth and
-                    quality, not single-meet outcomes.
+                    are <strong>not</strong> a factor in Team Five. This ensures rankings reflect overall squad depth and
+                    quality, not single-meet outcomes. Head-to-head team results <strong>are</strong> a factor in the{' '}
+                    <a href="?view=team-knockout">Team Knockout ranking</a> system (switch views above to compare).
                   </p>
                 </ExplainerBox>
                 <TeamTable teams={data.results} />
@@ -685,6 +686,18 @@ function MainRankingsView() {
 
             {view === 'team-knockout' && (
               <>
+                {isHistorical && (
+                  <div className="info-message" style={{
+                    padding: '15px',
+                    margin: '20px 0',
+                    backgroundColor: '#fff3cd',
+                    border: '1px solid #ffc107',
+                    borderRadius: '4px',
+                    color: '#856404'
+                  }}>
+                    <strong>Historical Team Knockout Rankings:</strong> Coming soon! Team Knockout rankings are currently only available for the current LIVE season. Historical snapshot support will be added in a future update.
+                  </div>
+                )}
                 <ExplainerBox
                   title="What is Team Knockout?"
                   links={[{ text: "Learn More in FAQ", href: "/faq#team-knockout" }]}
@@ -693,6 +706,9 @@ function MainRankingsView() {
                     <strong>Team Knockout</strong> is a head-to-head (H2H) ranking system that determines team
                     superiority based on <strong>direct matchup results</strong> rather than aggregate scores.
                     When two teams race at the same meet, the team with the better finish place "wins" that matchup.
+                    To be a direct matchup, both teams must field an "A"/"varsity" team. For NCAA divisions, a "varsity team"
+                    is determined by starters/finishers at the regional championships. Prior to regional championships,
+                    "varsity teams" are determined by an intra-squad algorithm that determines the top-7 squad members.
                   </p>
                   <p>
                     <strong>Key Difference from Team Five</strong>: Team Five rankings reflect overall squad depth

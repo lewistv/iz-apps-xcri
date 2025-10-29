@@ -72,6 +72,14 @@ export default function MatchupHistoryModal({
     return `${month}/${day}/${year}`;
   };
 
+  // Format number as ordinal (1st, 2nd, 3rd, 4th, etc.)
+  const formatOrdinal = (num) => {
+    if (!num) return 'N/A';
+    const suffixes = ['th', 'st', 'nd', 'rd'];
+    const value = num % 100;
+    return num + (suffixes[(value - 20) % 10] || suffixes[value] || suffixes[0]);
+  };
+
   // Determine if team won the matchup
   const isWin = (matchup, teamName) => {
     return matchup.winner_team_name === teamName;
@@ -119,7 +127,7 @@ export default function MatchupHistoryModal({
       <div className="modal-content matchup-history-modal" onClick={(e) => e.stopPropagation()}>
         {/* Header */}
         <div className="modal-header">
-          <h2>Matchup History - {team.team_name}</h2>
+          <h2>Season Varsity Matchups - {team.team_name}</h2>
           <button className="close-btn" onClick={onClose} aria-label="Close modal">
             ×
           </button>
@@ -181,7 +189,7 @@ export default function MatchupHistoryModal({
                         <th>Date</th>
                         <th>Meet</th>
                         <th>Opponent</th>
-                        <th>Rank</th>
+                        <th>Place</th>
                         <th>Score</th>
                         <th>Result</th>
                       </tr>
@@ -202,17 +210,15 @@ export default function MatchupHistoryModal({
                               {formatDate(matchup.race_date)}
                             </td>
                             <td className="meet-cell">
-                              {onMeetClick ? (
-                                <button
-                                  className="meet-link"
-                                  onClick={() => onMeetClick(matchup.race_hnd, matchup.meet_name)}
-                                  title="View all matchups from this meet"
-                                >
-                                  {matchup.meet_name}
-                                </button>
-                              ) : (
-                                matchup.meet_name
-                              )}
+                              <a
+                                href={`https://www.athletic.net/CrossCountry/meet/${matchup.race_hnd}/results/${matchup.race_hnd}?tab=team-scores`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="meet-link"
+                                title="View meet results on Athletic.net"
+                              >
+                                {matchup.meet_name}
+                              </a>
                             </td>
                             <td className="opponent-cell">
                               {onOpponentClick ? (
@@ -231,7 +237,7 @@ export default function MatchupHistoryModal({
                               )}
                             </td>
                             <td className="rank-cell text-center">
-                              #{opponentRank || 'N/A'}
+                              {formatOrdinal(opponentRank)}
                             </td>
                             <td className="score-cell text-center">
                               {score}

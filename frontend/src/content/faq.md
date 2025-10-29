@@ -584,6 +584,8 @@ Some ranking systems use:
 
 **No**. Team Five Rankings are based **solely on individual athlete XCRI placements**, not head-to-head team results.
 
+**Important**: Head-to-head team results ARE a factor in the [Team Knockout ranking](#team-knockout) system. See FAQ 10 for details on how Team Knockout differs from Team Five.
+
 ### How Team Five Rankings Work
 
 Team Five Rankings use the **top 5 athletes** from each team:
@@ -623,6 +625,8 @@ Instead, XCRI Team Five Rankings reflect:
 **Bottom Line**: Team Five Rankings aggregate individual athlete quality, not direct team-vs-team results.
 
 ---
+
+<a name="team-knockout"></a>
 
 ## FAQ 10: What is Team Knockout and How Does It Differ from Team Five?
 

@@ -47,26 +47,26 @@ async def get_team_knockout_rankings(
         Tuple of (results: List[Dict], total_count: int)
     """
     async with get_db_cursor() as cursor:
-        # Build WHERE clause
-        where_clauses = ["season_year = %s", "rank_group_type = %s"]
+        # Build WHERE clause (use table alias 'ko' for knockout table)
+        where_clauses = ["ko.season_year = %s", "ko.rank_group_type = %s"]
         params = [season_year, rank_group_type]
 
         if rank_group_fk is not None:
-            where_clauses.append("rank_group_fk = %s")
+            where_clauses.append("ko.rank_group_fk = %s")
             params.append(rank_group_fk)
 
         if gender_code:
-            where_clauses.append("gender_code = %s")
+            where_clauses.append("ko.gender_code = %s")
             params.append(gender_code.upper())
 
         if checkpoint_date:
-            where_clauses.append("checkpoint_date = %s")
+            where_clauses.append("ko.checkpoint_date = %s")
             params.append(checkpoint_date)
         else:
-            where_clauses.append("checkpoint_date IS NULL")
+            where_clauses.append("ko.checkpoint_date IS NULL")
 
         if search:
-            where_clauses.append("team_name LIKE %s")
+            where_clauses.append("ko.team_name LIKE %s")
             params.append(f"%{search}%")
 
         where_sql = " AND ".join(where_clauses)
@@ -74,41 +74,51 @@ async def get_team_knockout_rankings(
         # Get total count
         count_sql = f"""
             SELECT COUNT(*) as total
-            FROM iz_rankings_xcri_team_knockout
+            FROM iz_rankings_xcri_team_knockout ko
             WHERE {where_sql}
         """
         await cursor.execute(count_sql, params)
         total = (await cursor.fetchone())['total']
 
         # Get results with pagination
+        # Join with team_five table to get region/conference names
         query_sql = f"""
             SELECT
-                id,
-                team_id,
-                team_name,
-                team_code,
-                rank_group_type,
-                rank_group_fk,
-                gender_code,
-                regl_group_fk,
-                conf_group_fk,
-                regl_finish,
-                conf_finish,
-                knockout_rank,
-                team_five_rank,
-                elimination_method,
-                team_size,
-                athletes_with_xcri,
-                team_five_xcri_pts,
-                h2h_wins,
-                h2h_losses,
-                h2h_win_pct,
-                checkpoint_date,
-                season_year,
-                calculation_date
-            FROM iz_rankings_xcri_team_knockout
+                ko.id,
+                ko.team_id,
+                ko.team_name,
+                ko.team_code,
+                ko.rank_group_type,
+                ko.rank_group_fk,
+                ko.gender_code,
+                ko.regl_group_fk,
+                ko.conf_group_fk,
+                ko.regl_finish,
+                ko.conf_finish,
+                ko.knockout_rank,
+                ko.team_five_rank,
+                ko.elimination_method,
+                ko.team_size,
+                ko.athletes_with_xcri,
+                ko.team_five_xcri_pts,
+                ko.h2h_wins,
+                ko.h2h_losses,
+                ko.h2h_win_pct,
+                ko.checkpoint_date,
+                ko.season_year,
+                ko.calculation_date,
+                tf.regl_group_name,
+                tf.conf_group_name,
+                tf.most_recent_race_date
+            FROM iz_rankings_xcri_team_knockout ko
+            LEFT JOIN iz_rankings_xcri_team_five tf
+                ON ko.team_id = tf.anet_team_hnd
+                AND ko.season_year = tf.season_year
+                AND ko.rank_group_fk = tf.division_code
+                AND ko.gender_code = tf.gender_code
+                AND COALESCE(ko.checkpoint_date, '') = COALESCE(tf.checkpoint_date, '')
             WHERE {where_sql}
-            ORDER BY knockout_rank
+            ORDER BY ko.knockout_rank
             LIMIT %s OFFSET %s
         """
         await cursor.execute(query_sql, params + [limit, offset])
@@ -145,42 +155,50 @@ async def get_team_knockout_by_id(
         Single team record or None if not found
     """
     async with get_db_cursor() as cursor:
-        # Build WHERE clause
+        # Build WHERE clause (use table alias 'ko' for knockout table)
         where_clauses = [
-            "team_id = %s",
-            "season_year = %s",
-            "rank_group_type = %s"
+            "ko.team_id = %s",
+            "ko.season_year = %s",
+            "ko.rank_group_type = %s"
         ]
         params = [team_id, season_year, rank_group_type]
 
         if rank_group_fk is not None:
-            where_clauses.append("rank_group_fk = %s")
+            where_clauses.append("ko.rank_group_fk = %s")
             params.append(rank_group_fk)
 
         if gender_code:
-            where_clauses.append("gender_code = %s")
+            where_clauses.append("ko.gender_code = %s")
             params.append(gender_code.upper())
 
         if checkpoint_date:
-            where_clauses.append("checkpoint_date = %s")
+            where_clauses.append("ko.checkpoint_date = %s")
             params.append(checkpoint_date)
         else:
-            where_clauses.append("checkpoint_date IS NULL")
+            where_clauses.append("ko.checkpoint_date IS NULL")
 
         where_sql = " AND ".join(where_clauses)
 
+        # Join with team_five table to get region/conference names
         query_sql = f"""
             SELECT
-                id, team_id, team_name, team_code,
-                rank_group_type, rank_group_fk, gender_code,
-                regl_group_fk, conf_group_fk, regl_finish, conf_finish,
-                knockout_rank, team_five_rank, elimination_method,
-                team_size, athletes_with_xcri, team_five_xcri_pts,
-                h2h_wins, h2h_losses, h2h_win_pct,
-                checkpoint_date, season_year, calculation_date
-            FROM iz_rankings_xcri_team_knockout
+                ko.id, ko.team_id, ko.team_name, ko.team_code,
+                ko.rank_group_type, ko.rank_group_fk, ko.gender_code,
+                ko.regl_group_fk, ko.conf_group_fk, ko.regl_finish, ko.conf_finish,
+                ko.knockout_rank, ko.team_five_rank, ko.elimination_method,
+                ko.team_size, ko.athletes_with_xcri, ko.team_five_xcri_pts,
+                ko.h2h_wins, ko.h2h_losses, ko.h2h_win_pct,
+                ko.checkpoint_date, ko.season_year, ko.calculation_date,
+                tf.regl_group_name, tf.conf_group_name, tf.most_recent_race_date
+            FROM iz_rankings_xcri_team_knockout ko
+            LEFT JOIN iz_rankings_xcri_team_five tf
+                ON ko.team_id = tf.anet_team_hnd
+                AND ko.season_year = tf.season_year
+                AND ko.rank_group_fk = tf.division_code
+                AND ko.gender_code = tf.gender_code
+                AND COALESCE(ko.checkpoint_date, '') = COALESCE(tf.checkpoint_date, '')
             WHERE {where_sql}
-            ORDER BY calculation_date DESC
+            ORDER BY ko.calculation_date DESC
             LIMIT 1
         """
         await cursor.execute(query_sql, params)
