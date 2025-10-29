@@ -93,12 +93,20 @@ export default function MatchupHistoryModal({
     return matchup.team_a_name;
   };
 
-  // Get opponent rank
+  // Get opponent rank (finish place in race)
   const getOpponentRank = (matchup, teamName) => {
     if (matchup.team_a_name === teamName) {
       return matchup.team_b_rank;
     }
     return matchup.team_a_rank;
+  };
+
+  // Get opponent knockout rank (Session 020 - Team Knockout ranking at time of race)
+  const getOpponentKORank = (matchup, teamName) => {
+    if (matchup.team_a_name === teamName) {
+      return matchup.team_b_ko_rank;
+    }
+    return matchup.team_a_ko_rank;
   };
 
   // Get score display (team score vs opponent score)
@@ -199,6 +207,7 @@ export default function MatchupHistoryModal({
                         const won = isWin(matchup, team.team_name);
                         const opponentName = getOpponentName(matchup, team.team_name);
                         const opponentRank = getOpponentRank(matchup, team.team_name);
+                        const opponentKORank = getOpponentKORank(matchup, team.team_name);
                         const score = getScoreDisplay(matchup, team.team_name);
 
                         return (
@@ -211,7 +220,7 @@ export default function MatchupHistoryModal({
                             </td>
                             <td className="meet-cell">
                               <a
-                                href={`https://www.athletic.net/CrossCountry/meet/${matchup.race_hnd}/results/${matchup.race_hnd}?tab=team-scores`}
+                                href={`https://www.athletic.net/CrossCountry/meet/${matchup.meet_id || matchup.race_hnd}/results/${matchup.race_hnd}?tab=team-scores`}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="meet-link"
@@ -221,6 +230,7 @@ export default function MatchupHistoryModal({
                               </a>
                             </td>
                             <td className="opponent-cell">
+                              {opponentKORank && <span className="ko-rank-badge" title="Team Knockout rank">#{opponentKORank}</span>}
                               {onOpponentClick ? (
                                 <button
                                   className="opponent-link"

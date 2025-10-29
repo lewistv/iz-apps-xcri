@@ -317,8 +317,10 @@ function MainRankingsView() {
           offset: 0,
         };
 
-        // Note: Team Knockout API doesn't support region/conference filters yet
-        // (filtering happens client-side after fetch)
+        // Session 020: Add server-side region/conference filters
+        if (region) params.region = region;
+        if (conference) params.conference = conference;
+
         response = await teamKnockoutAPI.list(params);
         results = response.data.results || [];
 
