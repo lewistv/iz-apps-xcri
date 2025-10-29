@@ -652,3 +652,257 @@ class SeasonResume(BaseModel):
                 "updated_at": "2025-10-20T15:30:00"
             }
         }
+
+
+# ===================================================================
+# Team Knockout Models (Session 015)
+# ===================================================================
+
+class TeamKnockoutQueryParams(BaseModel):
+    """Query parameters for Team Knockout rankings endpoint"""
+    season_year: int = Field(default=2025, description="Season year")
+    rank_group_type: str = Field(
+        default="D",
+        description="Ranking group type (D=Division, R=Regional, C=Conference)",
+        pattern="^[DRC]$"
+    )
+    rank_group_fk: Optional[int] = Field(
+        default=None,
+        description="Ranking group ID (division_code for D, regl_group_fk for R, conf_group_fk for C)"
+    )
+    gender_code: Optional[str] = Field(
+        default=None,
+        description="Gender code (M or F)",
+        pattern="^[MFmf]$"
+    )
+    checkpoint_date: Optional[str] = Field(
+        default=None,
+        description="Rankings as of date (YYYY-MM-DD), null for LIVE rankings"
+    )
+    limit: int = Field(default=100, ge=1, le=500, description="Results per page")
+    offset: int = Field(default=0, ge=0, description="Pagination offset")
+    search: Optional[str] = Field(
+        default=None,
+        description="Search by team name"
+    )
+
+
+class MatchupQueryParams(BaseModel):
+    """Query parameters for matchup endpoints"""
+    season_year: int = Field(default=2025, description="Season year")
+    rank_group_type: str = Field(
+        default="D",
+        description="Ranking group type (D=Division, R=Regional, C=Conference)",
+        pattern="^[DRC]$"
+    )
+    rank_group_fk: Optional[int] = Field(
+        default=None,
+        description="Ranking group ID (division_code, regl_group_fk, or conf_group_fk)"
+    )
+    gender_code: Optional[str] = Field(
+        default=None,
+        description="Gender code (M or F)",
+        pattern="^[MFmf]$"
+    )
+    checkpoint_date: Optional[str] = Field(
+        default=None,
+        description="Rankings as of date (YYYY-MM-DD), null for LIVE rankings"
+    )
+    limit: int = Field(default=50, ge=1, le=500, description="Results per page")
+    offset: int = Field(default=0, ge=0, description="Pagination offset")
+
+
+class TeamKnockoutRanking(BaseModel):
+    """
+    Team Knockout ranking record from iz_rankings_xcri_team_knockout table.
+
+    H2H-based team rankings with flexible ranking contexts (Division, Regional, Conference).
+    """
+    # Primary key
+    id: int = Field(description="Primary key")
+
+    # Team identification
+    team_id: int = Field(description="Team identifier (anet_team_hnd)")
+    team_name: str = Field(description="Team display name")
+    team_code: Optional[str] = Field(default=None, description="Team code/abbreviation")
+
+    # Ranking context
+    rank_group_type: str = Field(description="Ranking group type: D=Division, R=Regional, C=Conference")
+    rank_group_fk: int = Field(description="Ranking group ID")
+    gender_code: str = Field(description="Gender: M or F")
+
+    # Regional/Conference context
+    regl_group_fk: Optional[int] = Field(default=None, description="Regional group ID")
+    conf_group_fk: Optional[int] = Field(default=None, description="Conference group ID")
+    regl_finish: Optional[int] = Field(default=None, description="Regional championship finish")
+    conf_finish: Optional[int] = Field(default=None, description="Conference championship finish")
+
+    # Ranking data
+    knockout_rank: int = Field(description="Team Knockout ranking (H2H-based, 1=best)")
+    team_five_rank: Optional[int] = Field(default=None, description="Team Five aggregate rank (for comparison)")
+    elimination_method: Optional[str] = Field(default=None, description="Tiebreaker method used")
+
+    # Team statistics
+    team_size: Optional[int] = Field(default=None, description="Total roster size")
+    athletes_with_xcri: Optional[int] = Field(default=None, description="Number of athletes with XCRI scores")
+    team_five_xcri_pts: Optional[float] = Field(default=None, description="SUM of top 5 athlete XCRI scores")
+
+    # H2H statistics
+    h2h_wins: Optional[int] = Field(default=None, description="Head-to-head wins in pool")
+    h2h_losses: Optional[int] = Field(default=None, description="Head-to-head losses in pool")
+    h2h_win_pct: Optional[float] = Field(default=None, description="Head-to-head win percentage")
+
+    # Snapshot metadata
+    checkpoint_date: Optional[str] = Field(default=None, description="Snapshot date (NULL = LIVE)")
+    season_year: int = Field(description="Season year (2024, 2025, etc.)")
+    calculation_date: datetime = Field(description="When this ranking was calculated")
+
+    class Config:
+        from_attributes = True
+
+
+class TeamKnockoutMatchup(BaseModel):
+    """
+    Individual H2H matchup record from iz_rankings_xcri_team_knockout_matchups table.
+
+    Stores head-to-head results between two teams at a specific meet.
+    """
+    # Primary key
+    matchup_id: int = Field(description="Primary key")
+
+    # Race/Meet information
+    race_hnd: int = Field(description="AthleticNET race handle")
+    race_date: date = Field(description="Date of the meet")
+    meet_name: str = Field(description="Name of the meet")
+
+    # Team A
+    team_a_id: int = Field(description="Team A anet_team_hnd")
+    team_a_name: Optional[str] = Field(default=None, description="Team A name (from join)")
+    team_a_rank: int = Field(description="Team A finish place in race")
+    team_a_score: int = Field(description="Team A XC scoring points")
+
+    # Team B
+    team_b_id: int = Field(description="Team B anet_team_hnd")
+    team_b_name: Optional[str] = Field(default=None, description="Team B name (from join)")
+    team_b_rank: int = Field(description="Team B finish place in race")
+    team_b_score: int = Field(description="Team B XC scoring points")
+
+    # Winner
+    winner_team_id: int = Field(description="Winner anet_team_hnd")
+    winner_team_name: Optional[str] = Field(default=None, description="Winner team name (from join)")
+
+    # Ranking context
+    season_year: int = Field(description="Season year")
+    rank_group_type: str = Field(description="D=Division, R=Regional, C=Conference")
+    rank_group_fk: int = Field(description="Group ID (division_code, etc.)")
+    gender_code: str = Field(description="M or F")
+
+    # Snapshot support
+    checkpoint_date: Optional[str] = Field(default=None, description="Snapshot date (NULL = LIVE)")
+
+    # Metadata
+    calculation_date: datetime = Field(description="When this data was calculated")
+
+    class Config:
+        from_attributes = True
+
+
+class MatchupStatsSummary(BaseModel):
+    """
+    Summary statistics for matchups (wins/losses).
+
+    Used to provide quick statistics in list responses.
+    """
+    total_matchups: int = Field(description="Total number of matchups")
+    wins: int = Field(description="Number of wins")
+    losses: int = Field(description="Number of losses")
+    win_pct: float = Field(description="Win percentage (0.0-100.0)")
+
+
+class CommonOpponent(BaseModel):
+    """
+    Common opponent record showing how two teams performed against the same opponent.
+
+    Used for common opponent analysis between two teams.
+    """
+    opponent_id: int = Field(description="Common opponent team ID")
+    opponent_name: Optional[str] = Field(default=None, description="Common opponent team name")
+    team_a_wins: int = Field(description="Team A wins vs this opponent")
+    team_a_losses: int = Field(description="Team A losses vs this opponent")
+    team_b_wins: int = Field(description="Team B wins vs this opponent")
+    team_b_losses: int = Field(description="Team B losses vs this opponent")
+
+
+class TeamKnockoutListResponse(BaseModel):
+    """Paginated list of Team Knockout rankings"""
+    total: int = Field(description="Total number of results")
+    limit: int = Field(description="Results per page")
+    offset: int = Field(description="Pagination offset")
+    results: List[TeamKnockoutRanking] = Field(description="List of Team Knockout rankings")
+
+
+class MatchupListResponse(BaseModel):
+    """
+    Paginated list of matchups with summary statistics.
+
+    Includes win-loss record and list of individual matchups.
+    """
+    total: int = Field(description="Total number of matchups")
+    limit: int = Field(description="Results per page")
+    offset: int = Field(description="Pagination offset")
+    stats: MatchupStatsSummary = Field(description="Win-loss summary statistics")
+    matchups: List[TeamKnockoutMatchup] = Field(description="List of matchup records")
+
+
+class HeadToHeadResponse(BaseModel):
+    """
+    Direct head-to-head comparison between two teams.
+
+    Provides overall record and complete matchup history.
+    """
+    team_a_id: int = Field(description="Team A identifier")
+    team_a_name: Optional[str] = Field(default=None, description="Team A name")
+    team_b_id: int = Field(description="Team B identifier")
+    team_b_name: Optional[str] = Field(default=None, description="Team B name")
+
+    total_matchups: int = Field(description="Total matchups between these teams")
+    team_a_wins: int = Field(description="Team A wins")
+    team_b_wins: int = Field(description="Team B wins")
+
+    # Latest matchup info
+    latest_matchup_date: Optional[date] = Field(default=None, description="Date of most recent matchup")
+    latest_winner_id: Optional[int] = Field(default=None, description="Winner of most recent matchup")
+
+    # Complete history
+    matchups: List[TeamKnockoutMatchup] = Field(description="Complete matchup history")
+
+
+class MeetMatchupsResponse(BaseModel):
+    """
+    All matchups from a specific meet.
+
+    Shows all head-to-head results from a particular race.
+    """
+    race_hnd: int = Field(description="AthleticNET race handle")
+    meet_name: str = Field(description="Name of the meet")
+    race_date: date = Field(description="Date of the race")
+    total_matchups: int = Field(description="Total number of matchups at this meet")
+    matchups: List[TeamKnockoutMatchup] = Field(description="List of matchup records")
+
+
+class CommonOpponentsResponse(BaseModel):
+    """
+    Common opponent analysis between two teams.
+
+    Shows how both teams performed against shared opponents.
+    """
+    team_a_id: int = Field(description="Team A identifier")
+    team_a_name: Optional[str] = Field(default=None, description="Team A name")
+    team_b_id: int = Field(description="Team B identifier")
+    team_b_name: Optional[str] = Field(default=None, description="Team B name")
+
+    total_common_opponents: int = Field(description="Number of common opponents")
+    team_a_record_vs_common: str = Field(description="Team A record vs common opponents (e.g., '5-2')")
+    team_b_record_vs_common: str = Field(description="Team B record vs common opponents (e.g., '4-3')")
+
+    common_opponents: List[CommonOpponent] = Field(description="List of common opponents with records")

@@ -77,6 +77,69 @@ export const teamsAPI = {
   resume: (teamId, params) => api.get(`/teams/${teamId}/resume`, { params }),
 };
 
+// Team Knockout API endpoints (Session 015)
+export const teamKnockoutAPI = {
+  /**
+   * List Team Knockout rankings (H2H-based) with filters and pagination
+   * @param {Object} params - Query parameters
+   * @param {number} params.season_year - Season year (default: 2025)
+   * @param {string} params.rank_group_type - Ranking type (D=Division, R=Regional, C=Conference)
+   * @param {number} params.rank_group_fk - Ranking group ID (division code, etc.)
+   * @param {string} params.gender_code - Gender code (M or F)
+   * @param {number} params.limit - Results per page (default: 100)
+   * @param {number} params.offset - Pagination offset (default: 0)
+   * @param {string} params.search - Search by team name
+   * @returns {Promise} API response with {total, limit, offset, results}
+   */
+  list: (params) => api.get('/team-knockout/', { params }),
+
+  /**
+   * Get single Team Knockout ranking by team ID
+   * @param {number} teamId - Team identifier (anet_team_hnd)
+   * @param {Object} params - Query parameters (season_year, rank_group_type, etc.)
+   * @returns {Promise} API response with team knockout ranking details
+   */
+  get: (teamId, params) => api.get(`/team-knockout/${teamId}`, { params }),
+
+  /**
+   * Get all matchups for a specific team
+   * @param {number} teamId - Team identifier (required)
+   * @param {Object} params - Query parameters
+   * @returns {Promise} API response with {total, limit, offset, stats, matchups}
+   */
+  matchups: (teamId, params) => api.get('/team-knockout/matchups', { params: { ...params, team_id: teamId } }),
+
+  /**
+   * Get head-to-head record between two teams
+   * @param {number} teamAId - First team identifier
+   * @param {number} teamBId - Second team identifier
+   * @param {Object} params - Query parameters
+   * @returns {Promise} API response with H2H stats and matchup history
+   */
+  headToHead: (teamAId, teamBId, params) => api.get('/team-knockout/matchups/head-to-head', {
+    params: { ...params, team_a_id: teamAId, team_b_id: teamBId }
+  }),
+
+  /**
+   * Get all matchups from a specific meet
+   * @param {number} raceHnd - Race handle (AthleticNET race ID)
+   * @param {Object} params - Query parameters
+   * @returns {Promise} API response with meet info and all matchups
+   */
+  meetMatchups: (raceHnd, params) => api.get(`/team-knockout/matchups/meet/${raceHnd}`, { params }),
+
+  /**
+   * Find common opponents between two teams
+   * @param {number} teamAId - First team identifier
+   * @param {number} teamBId - Second team identifier
+   * @param {Object} params - Query parameters
+   * @returns {Promise} API response with common opponent analysis
+   */
+  commonOpponents: (teamAId, teamBId, params) => api.get('/team-knockout/matchups/common-opponents', {
+    params: { ...params, team_a_id: teamAId, team_b_id: teamBId }
+  }),
+};
+
 // Metadata API endpoints
 export const metadataAPI = {
   /**
@@ -177,6 +240,7 @@ export default {
   api,
   athletesAPI,
   teamsAPI,
+  teamKnockoutAPI,
   metadataAPI,
   healthAPI,
   snapshotAPI,
