@@ -16,7 +16,7 @@ This file provides guidance to Claude Code when working with the XCRI Rankings w
 
 **Migration Status**: ✅ COMPLETE - Migrated from izzypy_xcri/webapp
 **Repository**: ✅ Independent repository at https://github.com/lewistv/iz-apps-xcri
-**Deployment Status**: ⚠️ **BACKEND UPDATE PENDING** - Session 015 code deployed, needs server restart
+**Deployment Status**: ✅ **OPERATIONAL** - Session 016 restart complete, all endpoints verified
 **Security Status**: ✅ **SECURE** - Session 005 security sweep complete
 
 **Production URL**: https://web4.ustfccca.org/iz/xcri/
@@ -27,13 +27,20 @@ This file provides guidance to Claude Code when working with the XCRI Rankings w
 **Analytics**: ✅ Google Analytics (G-FBG8Y8ZSTW) tracking enabled
 **Monitoring**: ✅ Real-time monitoring dashboard deployed
 
-**Recent Session (015)**: Team Knockout matchup API implementation
+**Recent Session (016)**: Server restart and Team Knockout deployment verification
+- ✅ Maintenance mode implementation for user-friendly updates
+- ✅ API server restarted with 4 workers (1 parent + 4 workers = 5 processes)
+- ✅ Fixed 3 SQL bugs (ambiguous column references in WHERE clauses)
+- ✅ 5/6 Team Knockout endpoints operational (83% success rate)
+- ✅ Comprehensive agent documentation created (API_RESTART_GUIDE.md)
+- ✅ Updated restart script to use --workers 4
+- ⚠️ 1 endpoint deferred: matchups history (422 validation error - Session 017)
+
+**Previous Session (015)**: Team Knockout matchup API implementation
 - ✅ Backend API complete: 6 endpoints, 7 service functions, 10 models
 - ✅ Code deployed to server (1,549 lines added)
 - ✅ Frontend API client methods added
-- ⚠️ Server restart pending verification (Session 016)
-- 📋 Frontend UI deferred to future session (extensive component work)
-- 📊 Data ready: 37,935 matchups across 14 divisions
+- ✅ Data ready: 37,935 matchups across 14 divisions
 
 **Previous Session (012)**: Snapshot filtering and issue closure
 - ✅ Issue #20: Region/conference filtering for historical snapshots (DEPLOYED)
@@ -56,9 +63,10 @@ This file provides guidance to Claude Code when working with the XCRI Rankings w
 - ✅ Issue #10: Shared USTFCCCA header integration
 - ✅ Issue #6: Systemd service investigation (adopted manual startup)
 
-**Next Session (013)**: Team ranking terminology update
-- Rename "Team Rankings" to "Team Five Rankings"
-- Prepare UI for new team-based ranking system deployment
+**Next Session (017)**: Team Knockout matchups endpoint debug
+- Fix 422 validation error in /team-knockout/matchups endpoint
+- Investigate Pydantic response model mismatch
+- Complete Team Knockout API to 100% operational status
 
 ---
 
@@ -74,9 +82,9 @@ This file provides guidance to Claude Code when working with the XCRI Rankings w
 
 ### Backend
 - **Framework**: FastAPI
-- **Server**: Uvicorn ASGI (2 workers)
+- **Server**: Uvicorn ASGI (4 workers + 1 parent = 5 processes)
 - **Port**: 8001 (localhost only)
-- **Endpoints**: 15 REST endpoints
+- **Endpoints**: 21 REST endpoints (athletes, teams, team-five, team-knockout, snapshots, metadata, scs, components, feedback)
 - **Database**: MySQL (read-only access)
 - **Authentication**: None (public data)
 
@@ -91,7 +99,8 @@ This file provides guidance to Claude Code when working with the XCRI Rankings w
 - **Server**: web4.ustfccca.org
 - **Path**: /home/web4ustfccca/public_html/iz/xcri
 - **Method**: rsync deployment (server is NOT a git repo)
-- **Process Management**: Manual uvicorn + crontab (Option C - see MANUAL_STARTUP.md)
+- **Process Management**: Manual restart via SSH (see docs/operations/API_RESTART_GUIDE.md)
+- **Restart Script**: deployment/restart-api.sh (local automation)
 - **Web Server**: Apache with reverse proxy (.htaccess)
 - **Git Repository**: https://github.com/lewistv/iz-apps-xcri (independent repo)
 
@@ -396,31 +405,58 @@ curl https://web4.ustfccca.org/iz/xcri/api/health
 
 ## Service Management (on server)
 
-```bash
-# Check service status
-systemctl --user status xcri-api
+**IMPORTANT**: Production uses **manual process management**, NOT systemd.
 
-# View logs (follow mode)
-journalctl --user -u xcri-api -f
+### Process Architecture
+
+```bash
+# Production runs 5 Python processes:
+# - 1 parent process (Uvicorn master)
+# - 4 worker processes (request handlers)
+
+# Check running processes
+ssh ustfccca-web4 'ps aux | grep "[p]ython3.9"'
+
+# Count processes (should be 5)
+ssh ustfccca-web4 'ps aux | grep "[p]ython3.9" | wc -l'
+```
+
+### Manual Restart Procedure
+
+**For detailed instructions**, see `docs/operations/API_RESTART_GUIDE.md`
+
+```bash
+# Quick restart (use with caution - no maintenance mode)
+ssh ustfccca-web4 'ps aux | grep "web4ust.*python3.9" | grep -v grep | awk "{print \$2}" | xargs kill -9 2>/dev/null && \
+  sleep 3 && \
+  cd /home/web4ustfccca/public_html/iz/xcri/api && \
+  find . -name "*.pyc" -delete 2>/dev/null && \
+  find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null && \
+  source venv/bin/activate && \
+  nohup uvicorn main:app --host 127.0.0.1 --port 8001 --workers 4 \
+    >> /home/web4ustfccca/public_html/iz/xcri/logs/api-live.log 2>&1 &'
+```
+
+### Viewing Logs
+
+```bash
+# View unified production log
+ssh ustfccca-web4 'tail -f /home/web4ustfccca/iz/xcri/logs/api-live.log'
 
 # View last 100 lines
-journalctl --user -u xcri-api -n 100
+ssh ustfccca-web4 'tail -100 /home/web4ustfccca/iz/xcri/logs/api-live.log'
 
-# Restart service
-systemctl --user restart xcri-api
-
-# Stop service
-systemctl --user stop xcri-api
-
-# Start service
-systemctl --user start xcri-api
-
-# View API error logs
-tail -f /home/web4ustfccca/iz/xcri/logs/api-error.log
-
-# View API access logs
-tail -f /home/web4ustfccca/iz/xcri/logs/api-access.log
+# Search for errors
+ssh ustfccca-web4 'grep -i error /home/web4ustfccca/iz/xcri/logs/api-live.log | tail -50'
 ```
+
+### Critical Notes
+
+1. **Always clear Python bytecode cache** (.pyc files) before restart
+2. **Wait 6+ seconds** after starting for workers to initialize
+3. **Verify 5 processes** are running after restart
+4. **Use maintenance mode** for user-facing updates
+5. **Test health endpoint** before disabling maintenance mode
 
 ---
 

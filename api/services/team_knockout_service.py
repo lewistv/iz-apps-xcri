@@ -356,7 +356,7 @@ async def get_head_to_head(
         Dict with h2h stats and matchup list
     """
     async with get_db_cursor() as cursor:
-        # Build WHERE clause
+        # Build WHERE clause (with table alias for use in subqueries)
         where_clauses = [
             "((team_a_id = %s AND team_b_id = %s) OR (team_a_id = %s AND team_b_id = %s))",
             "season_year = %s",
@@ -380,17 +380,26 @@ async def get_head_to_head(
 
         where_sql = " AND ".join(where_clauses)
 
+        # Build WHERE clause with table alias for main query
+        where_sql_with_alias = where_sql.replace("team_a_id", "m.team_a_id") \
+                                       .replace("team_b_id", "m.team_b_id") \
+                                       .replace("season_year", "m.season_year") \
+                                       .replace("rank_group_type", "m.rank_group_type") \
+                                       .replace("rank_group_fk", "m.rank_group_fk") \
+                                       .replace("gender_code", "m.gender_code") \
+                                       .replace("checkpoint_date", "m.checkpoint_date")
+
         # Get H2H statistics
         stats_sql = f"""
             SELECT
                 COUNT(*) as total_matchups,
-                SUM(CASE WHEN winner_team_id = %s THEN 1 ELSE 0 END) as team_a_wins,
-                SUM(CASE WHEN winner_team_id = %s THEN 1 ELSE 0 END) as team_b_wins,
-                MAX(race_date) as latest_matchup_date,
-                MAX(CASE WHEN race_date = (SELECT MAX(race_date) FROM iz_rankings_xcri_team_knockout_matchups WHERE {where_sql})
-                    THEN winner_team_id ELSE NULL END) as latest_winner_id
-            FROM iz_rankings_xcri_team_knockout_matchups
-            WHERE {where_sql}
+                SUM(CASE WHEN m.winner_team_id = %s THEN 1 ELSE 0 END) as team_a_wins,
+                SUM(CASE WHEN m.winner_team_id = %s THEN 1 ELSE 0 END) as team_b_wins,
+                MAX(m.race_date) as latest_matchup_date,
+                MAX(CASE WHEN m.race_date = (SELECT MAX(race_date) FROM iz_rankings_xcri_team_knockout_matchups WHERE {where_sql})
+                    THEN m.winner_team_id ELSE NULL END) as latest_winner_id
+            FROM iz_rankings_xcri_team_knockout_matchups m
+            WHERE {where_sql_with_alias}
         """
         await cursor.execute(stats_sql, [team_a_id, team_b_id] + params + params)
         stats = await cursor.fetchone()
@@ -440,7 +449,7 @@ async def get_head_to_head(
                 AND m.rank_group_fk = tw.rank_group_fk
                 AND m.gender_code = tw.gender_code
                 AND COALESCE(m.checkpoint_date, '9999-12-31') = COALESCE(tw.checkpoint_date, '9999-12-31')
-            WHERE {where_sql}
+            WHERE {where_sql_with_alias}
             ORDER BY m.race_date DESC
         """
         await cursor.execute(query_sql, params)
@@ -494,14 +503,14 @@ async def get_meet_matchups(
     """
     async with get_db_cursor() as cursor:
         # Build WHERE clause
-        where_clauses = ["race_hnd = %s", "season_year = %s"]
+        where_clauses = ["m.race_hnd = %s", "m.season_year = %s"]
         params = [race_hnd, season_year]
 
         if checkpoint_date:
-            where_clauses.append("checkpoint_date = %s")
+            where_clauses.append("m.checkpoint_date = %s")
             params.append(checkpoint_date)
         else:
-            where_clauses.append("checkpoint_date IS NULL")
+            where_clauses.append("m.checkpoint_date IS NULL")
 
         where_sql = " AND ".join(where_clauses)
 
@@ -663,14 +672,14 @@ async def get_common_opponents(
               AND {where_sql}
             GROUP BY opponent_id
             HAVING opponent_id NOT IN (%s, %s)
-            ORDER BY (team_a_wins + team_b_wins) DESC
+            ORDER BY (SUM(CASE WHEN m1.winner_team_id = %s THEN 1 ELSE 0 END) + SUM(CASE WHEN m2.winner_team_id = %s THEN 1 ELSE 0 END)) DESC
         """
 
         query_params = [
             team_a_id, team_a_id, team_a_id, team_b_id, team_b_id,  # CASE and SUM clauses
             team_a_id, team_b_id, team_a_id, team_b_id, team_b_id, team_b_id,  # JOIN conditions
             team_a_id, team_a_id, team_a_id,  # WHERE and LEFT JOIN
-        ] + params + [team_a_id, team_b_id]  # HAVING clause
+        ] + params + [team_a_id, team_b_id, team_a_id, team_b_id]  # HAVING + ORDER BY clauses
 
         await cursor.execute(query_sql, query_params)
         common_opponents = await cursor.fetchall()
