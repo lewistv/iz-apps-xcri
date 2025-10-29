@@ -12,11 +12,11 @@ This file provides guidance to Claude Code when working with the XCRI Rankings w
 
 ---
 
-## Current Status (October 26, 2025)
+## Current Status (October 29, 2025)
 
 **Migration Status**: ✅ COMPLETE - Migrated from izzypy_xcri/webapp
 **Repository**: ✅ Independent repository at https://github.com/lewistv/iz-apps-xcri
-**Deployment Status**: ✅ **DEPLOYED AND OPERATIONAL**
+**Deployment Status**: ⚠️ **BACKEND UPDATE PENDING** - Session 015 code deployed, needs server restart
 **Security Status**: ✅ **SECURE** - Session 005 security sweep complete
 
 **Production URL**: https://web4.ustfccca.org/iz/xcri/
@@ -27,7 +27,15 @@ This file provides guidance to Claude Code when working with the XCRI Rankings w
 **Analytics**: ✅ Google Analytics (G-FBG8Y8ZSTW) tracking enabled
 **Monitoring**: ✅ Real-time monitoring dashboard deployed
 
-**Recent Session (012)**: Snapshot filtering and issue closure
+**Recent Session (015)**: Team Knockout matchup API implementation
+- ✅ Backend API complete: 6 endpoints, 7 service functions, 10 models
+- ✅ Code deployed to server (1,549 lines added)
+- ✅ Frontend API client methods added
+- ⚠️ Server restart pending verification (Session 016)
+- 📋 Frontend UI deferred to future session (extensive component work)
+- 📊 Data ready: 37,935 matchups across 14 divisions
+
+**Previous Session (012)**: Snapshot filtering and issue closure
 - ✅ Issue #20: Region/conference filtering for historical snapshots (DEPLOYED)
 - ✅ Issue #19: Snapshot filtering (closed as duplicate)
 - ✅ Issue #21: Semantic UI styling (deferred to January 2026+)
@@ -162,6 +170,14 @@ xcri/
 
 **SCS Components**:
 - GET `/scs/athletes/{id}/components` - Component score breakdown
+
+**Team Knockout Rankings** (Session 015 - H2H matchup system):
+- GET `/team-knockout/` - List Team Knockout rankings (H2H-based)
+- GET `/team-knockout/{team_id}` - Single team knockout ranking
+- GET `/team-knockout/matchups` - Team's matchup history with win-loss stats
+- GET `/team-knockout/matchups/head-to-head` - Direct H2H comparison between two teams
+- GET `/team-knockout/matchups/meet/{race_hnd}` - All matchups from a specific meet
+- GET `/team-knockout/matchups/common-opponents` - Common opponent analysis
 
 **Metadata**:
 - GET `/metadata/` - List calculation metadata
@@ -618,7 +634,20 @@ tail -50 /home/web4ustfccca/iz/xcri/logs/api-error.log
 - Frontend: TeamProfile displays season resume HTML
 - Status: **Feature enhancements complete - 76% completion rate**
 
-**Next Session**: Remaining issues or user feedback review
+**Session 015** (October 29, 2025):
+- ✅ Team Knockout matchup API implementation (backend complete)
+- NEW: api/services/team_knockout_service.py - 7 async service functions (680 lines)
+- NEW: api/routes/team_knockout.py - 6 REST API endpoints (550 lines)
+- UPDATED: api/models.py - 10 Pydantic models for Team Knockout data (+255 lines)
+- UPDATED: api/main.py - Router registration
+- UPDATED: frontend/src/services/api.js - 6 API client methods
+- Data: 37,935 matchups across 14 divisions ready
+- Code: Committed and pushed to GitHub (commit: 1cf9f94)
+- Deployment: Files on server, restart pending (Session 016)
+- Frontend UI: Deferred to future session (extensive component work required)
+- Status: **Backend API complete, deployment verification needed**
+
+**Next Session (016)**: Server maintenance mode, API restart, agent creation
 
 ---
 
