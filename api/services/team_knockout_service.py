@@ -81,7 +81,7 @@ async def get_team_knockout_rankings(
         total = (await cursor.fetchone())['total']
 
         # Get results with pagination
-        # Join with team_five table to get region/conference names
+        # Join with team_rankings table to get region/conference names
         query_sql = f"""
             SELECT
                 ko.id,
@@ -107,16 +107,16 @@ async def get_team_knockout_rankings(
                 ko.checkpoint_date,
                 ko.season_year,
                 ko.calculation_date,
-                tf.regl_group_name,
-                tf.conf_group_name,
-                tf.most_recent_race_date
+                tr.regl_group_name,
+                tr.conf_group_name,
+                tr.most_recent_race_date
             FROM iz_rankings_xcri_team_knockout ko
-            LEFT JOIN iz_rankings_xcri_team_five tf
-                ON ko.team_id = tf.anet_team_hnd
-                AND ko.season_year = tf.season_year
-                AND ko.rank_group_fk = tf.division_code
-                AND ko.gender_code = tf.gender_code
-                AND COALESCE(ko.checkpoint_date, '') = COALESCE(tf.checkpoint_date, '')
+            LEFT JOIN iz_rankings_xcri_team_rankings tr
+                ON ko.team_id = tr.anet_team_hnd
+                AND ko.season_year = tr.season_year
+                AND ko.rank_group_fk = tr.division_code
+                AND ko.gender_code = tr.gender_code
+                AND COALESCE(ko.checkpoint_date, '') = COALESCE(tr.checkpoint_date, '')
             WHERE {where_sql}
             ORDER BY ko.knockout_rank
             LIMIT %s OFFSET %s
@@ -179,7 +179,7 @@ async def get_team_knockout_by_id(
 
         where_sql = " AND ".join(where_clauses)
 
-        # Join with team_five table to get region/conference names
+        # Join with team_rankings table to get region/conference names
         query_sql = f"""
             SELECT
                 ko.id, ko.team_id, ko.team_name, ko.team_code,
@@ -189,14 +189,14 @@ async def get_team_knockout_by_id(
                 ko.team_size, ko.athletes_with_xcri, ko.team_five_xcri_pts,
                 ko.h2h_wins, ko.h2h_losses, ko.h2h_win_pct,
                 ko.checkpoint_date, ko.season_year, ko.calculation_date,
-                tf.regl_group_name, tf.conf_group_name, tf.most_recent_race_date
+                tr.regl_group_name, tr.conf_group_name, tr.most_recent_race_date
             FROM iz_rankings_xcri_team_knockout ko
-            LEFT JOIN iz_rankings_xcri_team_five tf
-                ON ko.team_id = tf.anet_team_hnd
-                AND ko.season_year = tf.season_year
-                AND ko.rank_group_fk = tf.division_code
-                AND ko.gender_code = tf.gender_code
-                AND COALESCE(ko.checkpoint_date, '') = COALESCE(tf.checkpoint_date, '')
+            LEFT JOIN iz_rankings_xcri_team_rankings tr
+                ON ko.team_id = tr.anet_team_hnd
+                AND ko.season_year = tr.season_year
+                AND ko.rank_group_fk = tr.division_code
+                AND ko.gender_code = tr.gender_code
+                AND COALESCE(ko.checkpoint_date, '') = COALESCE(tr.checkpoint_date, '')
             WHERE {where_sql}
             ORDER BY ko.calculation_date DESC
             LIMIT 1
