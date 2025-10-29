@@ -734,8 +734,8 @@ class TeamKnockoutRanking(BaseModel):
     # Regional/Conference context
     regl_group_fk: Optional[int] = Field(default=None, description="Regional group ID")
     conf_group_fk: Optional[int] = Field(default=None, description="Conference group ID")
-    regl_group_name: Optional[str] = Field(default=None, description="Regional group name (from team_five join)")
-    conf_group_name: Optional[str] = Field(default=None, description="Conference group name (from team_five join)")
+    regl_group_name: Optional[str] = Field(default=None, description="Regional group name (Session 031 - direct field)")
+    conf_group_name: Optional[str] = Field(default=None, description="Conference group name (Session 031 - direct field)")
     regl_finish: Optional[int] = Field(default=None, description="Regional championship finish")
     conf_finish: Optional[int] = Field(default=None, description="Conference championship finish")
 
@@ -748,7 +748,7 @@ class TeamKnockoutRanking(BaseModel):
     team_size: Optional[int] = Field(default=None, description="Total roster size")
     athletes_with_xcri: Optional[int] = Field(default=None, description="Number of athletes with XCRI scores")
     team_five_xcri_pts: Optional[float] = Field(default=None, description="SUM of top 5 athlete XCRI scores")
-    most_recent_race_date: Optional[str] = Field(default=None, description="Most recent race date (from team_five join)")
+    most_recent_race_date: Optional[str] = Field(default=None, description="Most recent race date (Session 031 - direct field)")
 
     # H2H statistics
     h2h_wins: Optional[int] = Field(default=None, description="Head-to-head wins in pool")
@@ -775,6 +775,7 @@ class TeamKnockoutMatchup(BaseModel):
 
     # Race/Meet information
     race_hnd: int = Field(description="AthleticNET race handle")
+    meet_id: Optional[int] = Field(default=None, description="AthleticNET meet handle (Session 031)")
     race_date: date = Field(description="Date of the meet")
     meet_name: str = Field(description="Name of the meet")
 
@@ -783,12 +784,14 @@ class TeamKnockoutMatchup(BaseModel):
     team_a_name: Optional[str] = Field(default=None, description="Team A name (from join)")
     team_a_rank: int = Field(description="Team A finish place in race")
     team_a_score: int = Field(description="Team A XC scoring points")
+    team_a_ko_rank: Optional[int] = Field(default=None, description="Team A knockout rank at time of race (Session 031)")
 
     # Team B
     team_b_id: int = Field(description="Team B anet_team_hnd")
     team_b_name: Optional[str] = Field(default=None, description="Team B name (from join)")
     team_b_rank: int = Field(description="Team B finish place in race")
     team_b_score: int = Field(description="Team B XC scoring points")
+    team_b_ko_rank: Optional[int] = Field(default=None, description="Team B knockout rank at time of race (Session 031)")
 
     # Winner
     winner_team_id: int = Field(description="Winner anet_team_hnd")

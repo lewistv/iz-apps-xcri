@@ -81,7 +81,7 @@ async def get_team_knockout_rankings(
         total = (await cursor.fetchone())['total']
 
         # Get results with pagination
-        # Join with team_rankings table to get region/conference names
+        # Session 031: region/conference names now direct fields in team_knockout table
         query_sql = f"""
             SELECT
                 ko.id,
@@ -93,6 +93,8 @@ async def get_team_knockout_rankings(
                 ko.gender_code,
                 ko.regl_group_fk,
                 ko.conf_group_fk,
+                ko.regl_group_name,
+                ko.conf_group_name,
                 ko.regl_finish,
                 ko.conf_finish,
                 ko.knockout_rank,
@@ -101,22 +103,14 @@ async def get_team_knockout_rankings(
                 ko.team_size,
                 ko.athletes_with_xcri,
                 ko.team_five_xcri_pts,
+                ko.most_recent_race_date,
                 ko.h2h_wins,
                 ko.h2h_losses,
                 ko.h2h_win_pct,
                 ko.checkpoint_date,
                 ko.season_year,
-                ko.calculation_date,
-                tr.regl_group_name,
-                tr.conf_group_name,
-                tr.most_recent_race_date
+                ko.calculation_date
             FROM iz_rankings_xcri_team_knockout ko
-            LEFT JOIN iz_rankings_xcri_team_rankings tr
-                ON ko.team_id = tr.anet_team_hnd
-                AND ko.season_year = tr.season_year
-                AND ko.rank_group_fk = tr.division_code
-                AND ko.gender_code = tr.gender_code
-                AND COALESCE(ko.checkpoint_date, '') = COALESCE(tr.checkpoint_date, '')
             WHERE {where_sql}
             ORDER BY ko.knockout_rank
             LIMIT %s OFFSET %s
@@ -179,24 +173,20 @@ async def get_team_knockout_by_id(
 
         where_sql = " AND ".join(where_clauses)
 
-        # Join with team_rankings table to get region/conference names
+        # Session 031: region/conference names now direct fields in team_knockout table
         query_sql = f"""
             SELECT
                 ko.id, ko.team_id, ko.team_name, ko.team_code,
                 ko.rank_group_type, ko.rank_group_fk, ko.gender_code,
-                ko.regl_group_fk, ko.conf_group_fk, ko.regl_finish, ko.conf_finish,
+                ko.regl_group_fk, ko.conf_group_fk,
+                ko.regl_group_name, ko.conf_group_name,
+                ko.regl_finish, ko.conf_finish,
                 ko.knockout_rank, ko.team_five_rank, ko.elimination_method,
                 ko.team_size, ko.athletes_with_xcri, ko.team_five_xcri_pts,
+                ko.most_recent_race_date,
                 ko.h2h_wins, ko.h2h_losses, ko.h2h_win_pct,
-                ko.checkpoint_date, ko.season_year, ko.calculation_date,
-                tr.regl_group_name, tr.conf_group_name, tr.most_recent_race_date
+                ko.checkpoint_date, ko.season_year, ko.calculation_date
             FROM iz_rankings_xcri_team_knockout ko
-            LEFT JOIN iz_rankings_xcri_team_rankings tr
-                ON ko.team_id = tr.anet_team_hnd
-                AND ko.season_year = tr.season_year
-                AND ko.rank_group_fk = tr.division_code
-                AND ko.gender_code = tr.gender_code
-                AND COALESCE(ko.checkpoint_date, '') = COALESCE(tr.checkpoint_date, '')
             WHERE {where_sql}
             ORDER BY ko.calculation_date DESC
             LIMIT 1
@@ -283,18 +273,22 @@ async def get_team_matchups(
         stats_row = await cursor.fetchone()
 
         # Get matchup details with pagination
+        # Session 031: Added meet_id, team_a_ko_rank, team_b_ko_rank
         query_sql = f"""
             SELECT
                 m.matchup_id,
                 m.race_hnd,
+                m.meet_id,
                 m.race_date,
                 m.meet_name,
                 m.team_a_id,
                 m.team_a_rank,
                 m.team_a_score,
+                m.team_a_ko_rank,
                 m.team_b_id,
                 m.team_b_rank,
                 m.team_b_score,
+                m.team_b_ko_rank,
                 m.winner_team_id,
                 m.season_year,
                 m.rank_group_type,
@@ -423,18 +417,22 @@ async def get_head_to_head(
         stats = await cursor.fetchone()
 
         # Get matchup details
+        # Session 031: Added meet_id, team_a_ko_rank, team_b_ko_rank
         query_sql = f"""
             SELECT
                 m.matchup_id,
                 m.race_hnd,
+                m.meet_id,
                 m.race_date,
                 m.meet_name,
                 m.team_a_id,
                 m.team_a_rank,
                 m.team_a_score,
+                m.team_a_ko_rank,
                 m.team_b_id,
                 m.team_b_rank,
                 m.team_b_score,
+                m.team_b_ko_rank,
                 m.winner_team_id,
                 m.season_year,
                 m.rank_group_type,
@@ -533,18 +531,22 @@ async def get_meet_matchups(
         where_sql = " AND ".join(where_clauses)
 
         # Get matchups with team names
+        # Session 031: Added meet_id, team_a_ko_rank, team_b_ko_rank
         query_sql = f"""
             SELECT
                 m.matchup_id,
                 m.race_hnd,
+                m.meet_id,
                 m.race_date,
                 m.meet_name,
                 m.team_a_id,
                 m.team_a_rank,
                 m.team_a_score,
+                m.team_a_ko_rank,
                 m.team_b_id,
                 m.team_b_rank,
                 m.team_b_score,
+                m.team_b_ko_rank,
                 m.winner_team_id,
                 m.season_year,
                 m.rank_group_type,
