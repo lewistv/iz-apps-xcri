@@ -1,0 +1,384 @@
+/**
+ * Head-to-Head Modal Styles
+ * Session 018: Phase 2.2 - H2H comparison display
+ *
+ * Features side-by-side team comparison with visual win-loss display
+ */
+
+/* Modal size override */
+.h2h-modal {
+  max-width: 1000px;
+}
+
+/* Head-to-Head Comparison Container */
+.h2h-comparison {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 24px;
+  align-items: center;
+  margin-bottom: 32px;
+  padding: 24px;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: 12px;
+}
+
+/* Team Cards */
+.team-card {
+  text-align: center;
+  padding: 24px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: var(--shadow-md);
+  transition: transform 0.2s ease;
+}
+
+.team-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.team-card.team-a {
+  border-top: 4px solid var(--ustfccca-blue, #0066cc);
+}
+
+.team-card.team-b {
+  border-top: 4px solid var(--ustfccca-orange, #ff6600);
+}
+
+.team-name {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--ustfccca-navy, #003366);
+  margin: 0 0 16px 0;
+  min-height: 2.7rem; /* Ensure consistent height */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.team-stats {
+  margin-top: 12px;
+}
+
+.stat-value {
+  font-size: 3rem;
+  font-weight: 800;
+  color: var(--ustfccca-navy, #003366);
+  line-height: 1;
+  margin-bottom: 8px;
+}
+
+.stat-label {
+  font-size: 0.95rem;
+  color: var(--ustfccca-medium-gray, #666);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 600;
+}
+
+.stat-pct {
+  font-size: 1.1rem;
+  color: var(--ustfccca-medium-gray, #666);
+  margin-top: 8px;
+  font-weight: 600;
+}
+
+/* VS Divider */
+.vs-divider {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.vs-text {
+  font-size: 1.75rem;
+  font-weight: 900;
+  color: var(--ustfccca-navy, #003366);
+  background: white;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-md);
+  border: 3px solid var(--ustfccca-border-gray, #dee2e6);
+}
+
+.vs-line {
+  width: 2px;
+  height: 40px;
+  background: var(--ustfccca-border-gray, #dee2e6);
+}
+
+/* H2H Summary */
+.h2h-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  justify-content: center;
+  margin-bottom: 32px;
+  padding: 20px;
+  background-color: var(--ustfccca-light-gray, #f8f9fa);
+  border-radius: 8px;
+}
+
+.summary-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.summary-label {
+  font-size: 0.85rem;
+  color: var(--ustfccca-medium-gray, #666);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.summary-value {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--ustfccca-navy, #003366);
+}
+
+/* H2H History Section */
+.h2h-history {
+  margin-top: 32px;
+}
+
+.h2h-history h4 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--ustfccca-navy, #003366);
+  margin-bottom: 16px;
+}
+
+/* Matchups Table (inherits from MatchupHistoryModal) */
+.h2h-modal .matchups-table-container {
+  overflow-x: auto;
+  border-radius: 8px;
+  box-shadow: var(--shadow-sm);
+}
+
+.h2h-modal .matchups-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+  background: white;
+}
+
+.h2h-modal .matchups-table thead {
+  background: var(--ustfccca-navy, #003366);
+  color: white;
+}
+
+.h2h-modal .matchups-table th {
+  padding: 12px 15px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+.h2h-modal .matchups-table tbody tr {
+  border-bottom: 1px solid var(--border-color, #dee2e6);
+  transition: background-color 0.15s ease;
+}
+
+.h2h-modal .matchups-table tbody tr:hover {
+  background-color: var(--row-hover-bg, #e3f2fd);
+}
+
+.h2h-modal .matchups-table tbody tr.latest-matchup {
+  background-color: rgba(255, 215, 0, 0.1); /* Light gold */
+  font-weight: 600;
+}
+
+.h2h-modal .matchups-table td {
+  padding: 12px 15px;
+  color: var(--text-primary, #333);
+}
+
+.h2h-modal .matchups-table .nowrap {
+  white-space: nowrap;
+}
+
+.h2h-modal .matchups-table .text-center {
+  text-align: center;
+}
+
+.latest-badge {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 2px 8px;
+  background-color: #ffd700; /* Gold */
+  color: #333;
+  font-size: 0.7rem;
+  font-weight: 700;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.score-cell {
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+
+.winner-cell .winner-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.winner-badge.team-a-win {
+  background-color: rgba(0, 102, 204, 0.1); /* Light blue */
+  color: var(--ustfccca-blue, #0066cc);
+}
+
+.winner-badge.team-b-win {
+  background-color: rgba(255, 102, 0, 0.1); /* Light orange */
+  color: var(--ustfccca-orange, #ff6600);
+}
+
+/* Common Opponents Section */
+.common-opponents-section {
+  margin-top: 32px;
+  padding: 24px;
+  background-color: var(--ustfccca-light-gray, #f8f9fa);
+  border-radius: 8px;
+  text-align: center;
+}
+
+.common-opponents-btn {
+  padding: 12px 24px;
+  background-color: var(--ustfccca-blue, #0066cc);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow-sm);
+}
+
+.common-opponents-btn:hover {
+  background-color: var(--ustfccca-navy, #003366);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.common-opponents-note {
+  margin-top: 12px;
+  font-size: 0.9rem;
+  color: var(--ustfccca-medium-gray, #666);
+  font-style: italic;
+}
+
+/* No Matchups Message */
+.no-matchups-message {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--ustfccca-medium-gray, #666);
+  font-size: 1.05rem;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .h2h-modal {
+    max-width: 95%;
+  }
+
+  .h2h-comparison {
+    gap: 16px;
+  }
+
+  .team-card {
+    padding: 20px 16px;
+  }
+
+  .team-name {
+    font-size: 1.2rem;
+  }
+
+  .stat-value {
+    font-size: 2.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .h2h-comparison {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto;
+    gap: 16px;
+  }
+
+  .vs-divider {
+    flex-direction: row;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .vs-line {
+    width: 80px;
+    height: 2px;
+  }
+
+  .team-card {
+    padding: 16px;
+  }
+
+  .team-name {
+    font-size: 1.15rem;
+    min-height: auto;
+  }
+
+  .stat-value {
+    font-size: 2.25rem;
+  }
+
+  .h2h-summary {
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .summary-item {
+    align-items: center;
+    text-align: center;
+  }
+
+  /* Hide meet name column on mobile */
+  .h2h-modal .matchups-table th:nth-child(2),
+  .h2h-modal .matchups-table td:nth-child(2) {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .h2h-modal {
+    max-width: 100%;
+    max-height: 100vh;
+    border-radius: 0;
+  }
+
+  .modal-header h2 {
+    font-size: 1.15rem;
+  }
+
+  .stat-value {
+    font-size: 2rem;
+  }
+
+  .vs-text {
+    font-size: 1.5rem;
+    width: 50px;
+    height: 50px;
+  }
+}

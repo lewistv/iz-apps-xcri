@@ -11,6 +11,9 @@ import SnapshotSelector from './components/SnapshotSelector';
 import SearchBar from './components/SearchBar';
 import AthleteTable from './components/AthleteTable';
 import TeamTable from './components/TeamTable';
+import TeamKnockoutTable from './components/TeamKnockoutTable';
+import MatchupHistoryModal from './components/MatchupHistoryModal';
+import HeadToHeadModal from './components/HeadToHeadModal';
 import TeamProfile from './components/TeamProfile';
 import Pagination from './components/Pagination';
 import ExplainerBox from './components/ExplainerBox';
@@ -18,7 +21,7 @@ import FAQ from './pages/FAQ';
 import HowItWorks from './pages/HowItWorks';
 import Glossary from './pages/Glossary';
 import Feedback from './pages/Feedback';
-import { athletesAPI, teamsAPI, snapshotAPI, metadataAPI } from './services/api';
+import { athletesAPI, teamsAPI, teamKnockoutAPI, snapshotAPI, metadataAPI } from './services/api';
 import './App.css';
 
 /**
@@ -69,6 +72,15 @@ function MainRankingsView() {
 
   // Session 007: Latest calculation date from metadata
   const [latestCalculationDate, setLatestCalculationDate] = useState(null);
+
+  // Session 018: Matchup History Modal state
+  const [matchupModalOpen, setMatchupModalOpen] = useState(false);
+  const [selectedTeamForMatchup, setSelectedTeamForMatchup] = useState(null);
+
+  // Session 018: Head-to-Head Modal state
+  const [h2hModalOpen, setH2hModalOpen] = useState(false);
+  const [h2hTeamA, setH2hTeamA] = useState(null);
+  const [h2hTeamB, setH2hTeamB] = useState(null);
 
   // Debounce timer refs (Issue #8: Prevent overwhelming with rapid changes)
   const debounceTimerRef = useRef(null);  // For API calls (filter changes)
@@ -127,7 +139,9 @@ function MainRankingsView() {
   useEffect(() => {
     const divName = getDivisionName(division);
     const genderText = gender === 'M' ? 'Men' : 'Women';
-    const viewText = view === 'athletes' ? 'Athletes' : 'Teams';
+    const viewText = view === 'athletes' ? 'Athletes'
+                    : view === 'teams' ? 'Teams'
+                    : 'Team Knockout';
 
     let title = `USTFCCCA ::: XCRI Rankings - ${divName} ${genderText} ${viewText}`;
 
@@ -280,29 +294,52 @@ function MainRankingsView() {
   /**
    * Fetch current rankings from MySQL database
    * Session 010: Use server-side filtering for region/conference
+   * Session 018: Added Team Knockout support
    */
   const fetchCurrentData = async () => {
     setLoading(true);
     setError(null);
 
     try {
-      // Fetch data with server-side region/conference filtering
-      const params = {
-        season_year: 2025,
-        division,
-        gender,
-        limit: 50000,  // Large limit to get full filtered results
-        offset: 0,
-      };
+      let response;
+      let params;
+      let results;
 
-      // Add server-side region/conference filters (Session 010)
-      if (region) params.region = region;
-      if (conference) params.conference = conference;
+      // Handle different view types with different API requirements
+      if (view === 'team-knockout') {
+        // Team Knockout uses different parameter structure
+        params = {
+          season_year: 2025,
+          rank_group_type: 'D',  // D=Division ranking
+          rank_group_fk: division,
+          gender_code: gender,
+          limit: 50000,  // Large limit to get full filtered results
+          offset: 0,
+        };
 
-      const api = view === 'athletes' ? athletesAPI : teamsAPI;
-      const response = await api.list(params);
+        // Note: Team Knockout API doesn't support region/conference filters yet
+        // (filtering happens client-side after fetch)
+        response = await teamKnockoutAPI.list(params);
+        results = response.data.results || [];
 
-      const results = response.data.results || [];
+      } else {
+        // Athletes and Team Five use standard parameter structure
+        params = {
+          season_year: 2025,
+          division,
+          gender,
+          limit: 50000,  // Large limit to get full filtered results
+          offset: 0,
+        };
+
+        // Add server-side region/conference filters (Session 010)
+        if (region) params.region = region;
+        if (conference) params.conference = conference;
+
+        const api = view === 'athletes' ? athletesAPI : teamsAPI;
+        response = await api.list(params);
+        results = response.data.results || [];
+      }
 
       // Extract unique regions and conferences
       const uniqueRegions = [...new Set(
@@ -530,7 +567,13 @@ function MainRankingsView() {
                 onClick={() => handleViewChange('teams')}
                 className={`selector-button ${view === 'teams' ? 'active' : ''}`}
               >
-                Teams
+                Team Five
+              </button>
+              <button
+                onClick={() => handleViewChange('team-knockout')}
+                className={`selector-button ${view === 'team-knockout' ? 'active' : ''}`}
+              >
+                Team Knockout
               </button>
             </div>
           </div>
@@ -574,7 +617,7 @@ function MainRankingsView() {
         {/* Data Table */}
         {!loading && !error && data.results && data.results.length > 0 && (
           <>
-            {view === 'athletes' ? (
+            {view === 'athletes' && (
               <>
                 <ExplainerBox
                   title="What is XCRI?"
@@ -615,7 +658,9 @@ function MainRankingsView() {
                   isHistorical={isHistorical}  // Pass flag to disable SCS modal for historical
                 />
               </>
-            ) : (
+            )}
+
+            {view === 'teams' && (
               <>
                 <ExplainerBox
                   title="How are Team Five Rankings Calculated?"
@@ -635,6 +680,41 @@ function MainRankingsView() {
                   </p>
                 </ExplainerBox>
                 <TeamTable teams={data.results} />
+              </>
+            )}
+
+            {view === 'team-knockout' && (
+              <>
+                <ExplainerBox
+                  title="What is Team Knockout?"
+                  links={[{ text: "Learn More in FAQ", href: "/faq#team-knockout" }]}
+                >
+                  <p>
+                    <strong>Team Knockout</strong> is a head-to-head (H2H) ranking system that determines team
+                    superiority based on <strong>direct matchup results</strong> rather than aggregate scores.
+                    When two teams race at the same meet, the team with the better finish place "wins" that matchup.
+                  </p>
+                  <p>
+                    <strong>Key Difference from Team Five</strong>: Team Five rankings reflect overall squad depth
+                    (sum of top 5 athletes' XCRI ranks), while Team Knockout focuses on <strong>win-loss records</strong>
+                    from head-to-head competitions. A team might have high raw talent (high Team Five) but struggle
+                    in direct matchups, or vice versa.
+                  </p>
+                  <p>
+                    <strong>Reading the Table</strong>: Click on a team's W-L record to view their complete matchup
+                    history, including opponents faced, results, and head-to-head statistics. The "KO Rank" shows
+                    position based on H2H records, with ties broken by Team Five rankings.
+                  </p>
+                </ExplainerBox>
+                <TeamKnockoutTable
+                  teams={data.results}
+                  loading={loading}
+                  isHistorical={isHistorical}
+                  onMatchupClick={(team) => {
+                    setSelectedTeamForMatchup(team);
+                    setMatchupModalOpen(true);
+                  }}
+                />
               </>
             )}
 
@@ -661,6 +741,44 @@ function MainRankingsView() {
 
       {/* USTFCCCA Footer */}
       <Footer />
+
+      {/* Matchup History Modal (Session 018) */}
+      {matchupModalOpen && selectedTeamForMatchup && (
+        <MatchupHistoryModal
+          team={selectedTeamForMatchup}
+          onClose={() => {
+            setMatchupModalOpen(false);
+            setSelectedTeamForMatchup(null);
+          }}
+          onMeetClick={(raceHnd, meetName) => {
+            // TODO: Open MeetMatchupsModal (Session 018 Phase 3)
+            console.log('Meet click:', meetName, raceHnd);
+          }}
+          onOpponentClick={(teamA, teamB) => {
+            // Open Head-to-Head modal
+            setH2hTeamA(teamA);
+            setH2hTeamB(teamB);
+            setH2hModalOpen(true);
+          }}
+        />
+      )}
+
+      {/* Head-to-Head Modal (Session 018) */}
+      {h2hModalOpen && h2hTeamA && h2hTeamB && (
+        <HeadToHeadModal
+          teamA={h2hTeamA}
+          teamB={h2hTeamB}
+          onClose={() => {
+            setH2hModalOpen(false);
+            setH2hTeamA(null);
+            setH2hTeamB(null);
+          }}
+          onCommonOpponentsClick={(teamA, teamB) => {
+            // TODO: Open CommonOpponentsPanel (Session 018 Phase 3)
+            console.log('Common opponents click:', teamA.team_name, 'vs', teamB.team_name);
+          }}
+        />
+      )}
     </div>
   );
 }

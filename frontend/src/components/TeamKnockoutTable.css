@@ -1,0 +1,56 @@
+/**
+ * Team Knockout Table Specific Styling
+ * Session 018: Phase 1
+ *
+ * Most styling is inherited from RankingsTable.css
+ * This file contains Team Knockout-specific enhancements
+ */
+
+/* Record cell styling - make clickable appearance more obvious */
+.rankings-table .record-cell .cell-link {
+  color: var(--ustfccca-blue);
+  font-weight: 600;
+  text-decoration: none;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.rankings-table .record-cell .cell-link:hover {
+  background-color: var(--ustfccca-light-blue, #e3f2fd);
+  transform: translateY(-1px);
+}
+
+.rankings-table .record-cell .cell-link:active {
+  transform: translateY(0);
+}
+
+/* Responsive adjustments for Team Knockout table */
+@media (max-width: 1024px) {
+  /* Hide team size column on tablets */
+  .rankings-table th:last-child,
+  .rankings-table td:last-child {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  /* On mobile, hide conference column and show only essential data */
+  .rankings-table th:nth-child(4), /* Conference */
+  .rankings-table td:nth-child(4) {
+    display: none;
+  }
+
+  /* Adjust record cell for smaller screens */
+  .rankings-table .record-cell {
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 480px) {
+  /* On very small screens, hide region as well */
+  .rankings-table th:nth-child(3), /* Region */
+  .rankings-table td:nth-child(3) {
+    display: none;
+  }
+}

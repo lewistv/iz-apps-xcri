@@ -1,0 +1,319 @@
+/**
+ * Matchup History Modal Styles
+ * Session 018: Phase 2 - Matchup history display
+ *
+ * Inherits base modal styles from SCSModal.css pattern
+ * Adds matchup-specific styling for wins/losses, opponent links, etc.
+ */
+
+/* Modal size override for matchup history (wider for table) */
+.matchup-history-modal {
+  max-width: 1100px;
+}
+
+/* Matchup Summary Cards */
+.matchup-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+  padding: 20px;
+  background-color: var(--ustfccca-light-gray, #f8f9fa);
+  border-radius: 8px;
+}
+
+.summary-card {
+  text-align: center;
+  padding: 16px;
+  background: white;
+  border-radius: 6px;
+  box-shadow: var(--shadow-sm);
+}
+
+.summary-label {
+  font-size: 0.85rem;
+  color: var(--ustfccca-medium-gray, #666);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.summary-value {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--ustfccca-navy, #003366);
+}
+
+.record-value .wins {
+  color: #22c55e; /* Green */
+}
+
+.record-value .losses {
+  color: #ef4444; /* Red */
+}
+
+/* Matchups Table */
+.matchups-table-container {
+  overflow-x: auto;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  box-shadow: var(--shadow-sm);
+}
+
+.matchups-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+  background: white;
+}
+
+.matchups-table thead {
+  background: var(--ustfccca-navy, #003366);
+  color: white;
+}
+
+.matchups-table th {
+  padding: 12px 15px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+.matchups-table tbody tr {
+  border-bottom: 1px solid var(--border-color, #dee2e6);
+  transition: background-color 0.15s ease;
+}
+
+.matchups-table tbody tr:hover {
+  background-color: var(--row-hover-bg, #e3f2fd);
+}
+
+/* Win/Loss row colors (subtle) */
+.matchups-table tbody tr.win-row {
+  background-color: rgba(34, 197, 94, 0.05); /* Very light green */
+}
+
+.matchups-table tbody tr.loss-row {
+  background-color: rgba(239, 68, 68, 0.05); /* Very light red */
+}
+
+.matchups-table tbody tr.win-row:hover,
+.matchups-table tbody tr.loss-row:hover {
+  background-color: var(--row-hover-bg, #e3f2fd);
+}
+
+.matchups-table td {
+  padding: 12px 15px;
+  color: var(--text-primary, #333);
+}
+
+.matchups-table .nowrap {
+  white-space: nowrap;
+}
+
+.matchups-table .text-center {
+  text-align: center;
+}
+
+/* Clickable links in table */
+.meet-link,
+.opponent-link {
+  background: none;
+  border: none;
+  color: var(--ustfccca-blue, #0066cc);
+  text-decoration: none;
+  cursor: pointer;
+  padding: 0;
+  font-size: inherit;
+  font-family: inherit;
+  text-align: left;
+  transition: color 0.2s ease;
+}
+
+.meet-link:hover,
+.opponent-link:hover {
+  color: var(--ustfccca-navy, #003366);
+  text-decoration: underline;
+}
+
+/* Result badge */
+.result-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  min-width: 30px;
+}
+
+.result-cell.win .result-badge {
+  background-color: #22c55e;
+  color: white;
+}
+
+.result-cell.loss .result-badge {
+  background-color: #ef4444;
+  color: white;
+}
+
+/* Pagination Controls */
+.pagination-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 0;
+  margin-top: 20px;
+  border-top: 1px solid var(--border-color, #dee2e6);
+}
+
+.pagination-btn {
+  padding: 8px 16px;
+  background-color: var(--ustfccca-blue, #0066cc);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  background-color: var(--ustfccca-navy, #003366);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+
+.pagination-btn:disabled {
+  background-color: var(--ustfccca-medium-gray, #ccc);
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.pagination-info {
+  font-size: 0.9rem;
+  color: var(--text-secondary, #666);
+}
+
+/* Loading and Error States */
+.loading-message,
+.error-message,
+.no-matchups-message {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.loading-message .loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid var(--ustfccca-light-gray, #f0f0f0);
+  border-top-color: var(--ustfccca-blue, #0066cc);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto 16px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.error-message p {
+  color: var(--error-color, #ef4444);
+  margin-bottom: 16px;
+}
+
+.retry-button {
+  padding: 8px 16px;
+  background-color: var(--ustfccca-blue, #0066cc);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.retry-button:hover {
+  background-color: var(--ustfccca-navy, #003366);
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .matchup-history-modal {
+    max-width: 95%;
+  }
+
+  .summary-value {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .matchup-summary {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    padding: 16px;
+  }
+
+  .summary-card {
+    padding: 12px;
+  }
+
+  .summary-value {
+    font-size: 1.35rem;
+  }
+
+  /* Hide rank column on mobile */
+  .matchups-table th:nth-child(4),
+  .matchups-table td:nth-child(4) {
+    display: none;
+  }
+
+  /* Adjust table font sizes */
+  .matchups-table {
+    font-size: 0.85rem;
+  }
+
+  .matchups-table th,
+  .matchups-table td {
+    padding: 8px 10px;
+  }
+
+  .pagination-controls {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .pagination-info {
+    order: -1;
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Stack modal full-screen on very small devices */
+  .matchup-history-modal {
+    max-width: 100%;
+    max-height: 100vh;
+    border-radius: 0;
+  }
+
+  .modal-header h2 {
+    font-size: 1.25rem;
+  }
+
+  /* Hide score column on very small screens */
+  .matchups-table th:nth-child(5),
+  .matchups-table td:nth-child(5) {
+    display: none;
+  }
+
+  .meet-cell {
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}

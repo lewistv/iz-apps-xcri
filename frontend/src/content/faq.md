@@ -624,5 +624,68 @@ Instead, XCRI Team Five Rankings reflect:
 
 ---
 
-**Document Version**: 1.1  
-**Created**: October 20, 2025  
+## FAQ 10: What is Team Knockout and How Does It Differ from Team Five?
+
+**Team Knockout** is an alternative team ranking system that focuses on **head-to-head (H2H) team matchup results** rather than aggregate individual athlete scores.
+
+### How Team Knockout Works
+
+When two teams race at the same meet, they create a "matchup":
+
+1. The team with the better finish place **wins** that matchup
+2. Teams are ranked by their **win-loss (W-L) records** against all opponents
+3. Ties are broken by Team Five rankings
+
+### Key Differences from Team Five
+
+| Aspect | Team Five | Team Knockout |
+|--------|-----------|---------------|
+| **Basis** | Sum of top 5 athletes' XCRI ranks | Win-loss record from H2H matchups |
+| **Focus** | Individual athlete quality | Direct team competition results |
+| **Philosophy** | Squad depth and talent | Head-to-head performance |
+| **Single-Meet Impact** | Minimal (season-long aggregate) | High (each matchup counts as W or L) |
+
+### Why Both Rankings Matter
+
+**Team Five** reflects overall squad talent and depth:
+- A team might have exceptional athletes across the board
+- Captures season-long consistency and strength of schedule
+- Less affected by single-meet circumstances
+
+**Team Knockout** reflects competitive success:
+- A team might excel at direct competition despite lower raw talent
+- Shows ability to perform when it matters against specific opponents
+- Emphasizes race-day execution and tactical strength
+
+### Example Scenario
+
+**Iowa State** might have:
+- **Team Five Rank**: #1 (highest aggregate talent)
+- **Team Knockout Rank**: #2 (lost one H2H matchup to Virginia)
+
+This means Iowa State has the best overall squad talent, but Virginia beat them head-to-head at a meet. Both rankings provide valuable insights:
+- Iowa State likely has deeper talent across more athletes
+- Virginia proved they can beat Iowa State in direct competition
+- Championship outcomes could favor either team depending on race conditions
+
+### How to Use Team Knockout Rankings
+
+1. **Click on a team's W-L record** to view complete matchup history
+2. **View head-to-head comparisons** between specific teams
+3. **Analyze common opponents** when teams haven't faced each other
+4. **Compare with Team Five** to understand talent vs. competitive performance
+
+### What Team Knockout Shows
+
+**High Win %**: Team consistently wins direct matchups (strong race-day execution)
+**Low Win %**: Team struggles in direct competition despite potential talent
+**Team Five >> Team Knockout**: Strong individual talent, but loses matchups
+**Team Knockout >> Team Five**: Performs above talent level in competition
+
+**Bottom Line**: Team Knockout complements Team Five by showing head-to-head competitive success rather than aggregate squad quality.
+
+---
+
+**Document Version**: 1.2
+**Created**: October 20, 2025
+**Updated**: October 29, 2025 (Session 018: Added Team Knockout FAQ)  
