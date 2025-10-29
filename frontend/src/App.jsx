@@ -313,7 +313,7 @@ function MainRankingsView() {
           rank_group_type: 'D',  // D=Division ranking
           rank_group_fk: division,
           gender_code: gender,
-          limit: 50000,  // Large limit to get full filtered results
+          limit: 500,  // API maximum limit (changed from 50000 - Session 018 bugfix)
           offset: 0,
         };
 
