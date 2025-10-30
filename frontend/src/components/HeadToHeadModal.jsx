@@ -171,15 +171,17 @@ export default function HeadToHeadModal({
               {/* Matchups History */}
               {h2hData.matchups && h2hData.matchups.length > 0 ? (
                 <div className="h2h-history">
-                  <h4>Matchup History</h4>
+                  <h4>Matchups This Season</h4>
                   <div className="matchups-table-container">
                     <table className="matchups-table">
                       <thead>
                         <tr>
                           <th>Date</th>
                           <th>Meet</th>
-                          <th>{h2hData.team_a_name}</th>
-                          <th>{h2hData.team_b_name}</th>
+                          <th>{h2hData.team_a_name} Place</th>
+                          <th>{h2hData.team_a_name} Score</th>
+                          <th>{h2hData.team_b_name} Place</th>
+                          <th>{h2hData.team_b_name} Score</th>
                           <th>Winner</th>
                         </tr>
                       </thead>
@@ -196,8 +198,14 @@ export default function HeadToHeadModal({
                                 {isLatest && <span className="latest-badge">Latest</span>}
                               </td>
                               <td>{matchup.meet_name}</td>
+                              <td className="text-center nowrap">
+                                {matchup.team_a_rank ? `${matchup.team_a_rank}${['st','nd','rd'][((matchup.team_a_rank+90)%100-10)%10-1]||'th'}` : '-'}
+                              </td>
                               <td className="text-center score-cell">
                                 {matchup.team_a_score}
+                              </td>
+                              <td className="text-center nowrap">
+                                {matchup.team_b_rank ? `${matchup.team_b_rank}${['st','nd','rd'][((matchup.team_b_rank+90)%100-10)%10-1]||'th'}` : '-'}
                               </td>
                               <td className="text-center score-cell">
                                 {matchup.team_b_score}

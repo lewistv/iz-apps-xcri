@@ -335,10 +335,12 @@ async def get_team_matchups(
                 AND m.gender_code = tw.gender_code
                 AND COALESCE(m.checkpoint_date, '9999-12-31') = COALESCE(tw.checkpoint_date, '9999-12-31')
             WHERE {where_sql}
-            ORDER BY m.race_date DESC
+            ORDER BY
+                CASE WHEN m.team_a_id = %s THEN m.team_b_ko_rank ELSE m.team_a_ko_rank END ASC,
+                m.race_date DESC
             LIMIT %s OFFSET %s
         """
-        await cursor.execute(query_sql, params + [limit, offset])
+        await cursor.execute(query_sql, params + [team_id, limit, offset])
         matchups = await cursor.fetchall()
 
         stats = {
