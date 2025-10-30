@@ -495,6 +495,103 @@ curl https://web4.ustfccca.org/iz/xcri/api/health
 - Symptoms: API serves old code despite correct files on server
 - Must kill process, clear cache, restart with fresh code
 
+#### Troubleshooting API Restart Issues
+
+**Problem**: Recurring zombie processes or "Address already in use" errors
+
+**Diagnosis**:
+```bash
+# Check for running XCRI API processes
+ssh ustfccca-web4 'ps aux | grep python3.9 | grep uvicorn | grep -v grep'
+
+# Check for zombie (defunct) processes
+ssh ustfccca-web4 'ps aux | grep python3.9 | grep defunct'
+
+# Check if port 8001 is in use
+ssh ustfccca-web4 'lsof -i :8001' || ssh ustfccca-web4 'netstat -tuln | grep 8001'
+```
+
+**Solution 1: Targeted Process Killing** (preferred over killall):
+```bash
+# Identify and kill only XCRI API processes (not all python3.9 processes)
+ssh ustfccca-web4 'ps aux | grep "web4ust.*python3.9.*uvicorn" | grep -v grep | awk "{print \$2}" | xargs kill -9 2>/dev/null'
+
+# Wait for processes to terminate
+sleep 3
+
+# Verify no processes remain
+ssh ustfccca-web4 'ps aux | grep "web4ust.*python3.9.*uvicorn" | grep -v grep'  # Should be empty
+
+# Verify port 8001 is free
+ssh ustfccca-web4 'netstat -tuln | grep 8001'  # Should be empty
+```
+
+**Solution 2: Zombie Process Cleanup**:
+```bash
+# If you see defunct/zombie processes, identify their PIDs
+ssh ustfccca-web4 'ps aux | grep python3.9 | grep defunct'
+
+# Kill specific zombie PIDs (replace with actual PIDs from above)
+ssh ustfccca-web4 'kill -9 PID1 PID2 PID3'
+
+# If zombies persist, kill their parent process (usually the main uvicorn process)
+ssh ustfccca-web4 'ps aux | grep "web4ust.*python3.9.*uvicorn" | grep -v grep | head -1 | awk "{print \$2}" | xargs kill -9'
+```
+
+**Solution 3: Complete Clean Restart** (when all else fails):
+```bash
+# Nuclear option - kill all python3.9 processes (use with caution!)
+ssh ustfccca-web4 'killall -9 python3.9 uvicorn 2>/dev/null'
+sleep 3
+
+# Verify everything is dead
+ssh ustfccca-web4 'ps aux | grep python3.9 | grep -v grep'  # Should be empty
+
+# Clear bytecode cache
+ssh ustfccca-web4 'cd /home/web4ustfccca/public_html/iz/xcri/api && \
+  find . -name "*.pyc" -delete 2>/dev/null && \
+  find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null'
+
+# Start fresh
+ssh ustfccca-web4 'cd /home/web4ustfccca/public_html/iz/xcri/api && \
+  source venv/bin/activate && \
+  nohup uvicorn main:app --host 127.0.0.1 --port 8001 --workers 4 \
+    >> ../logs/api-live.log 2>&1 &'
+
+# Wait for full initialization
+sleep 12
+
+# Verify correct number of processes (5 total: 1 parent + 4 workers)
+ssh ustfccca-web4 'ps aux | grep "[p]ython3.9.*uvicorn" | wc -l'  # Should return 5
+
+# Test health endpoint
+curl -s https://web4.ustfccca.org/iz/xcri/api/health | python3 -m json.tool
+```
+
+**Prevention Best Practices**:
+1. **Always check for running processes** before attempting restart
+2. **Use targeted process killing** (grep for web4ust) instead of killall when possible
+3. **Verify port is free** before starting new processes
+4. **Wait adequate time** (10-12 seconds) for multi-worker initialization
+5. **Check process count** after restart (should be exactly 5)
+6. **Test health endpoint** before considering restart successful
+
+**Common Symptoms and Causes**:
+- "Address already in use" → Old process still running on port 8001
+- Zombie (defunct) processes → Worker crashed but parent didn't clean up
+- Only 1-2 processes instead of 5 → Workers failed to start, check logs
+- API serves old code → Bytecode cache not cleared before restart
+- API responds slowly → Too many concurrent workers, check process count
+
+**Emergency Log Check**:
+```bash
+# View last 50 lines of API log for errors
+ssh ustfccca-web4 'tail -50 /home/web4ustfccca/public_html/iz/xcri/logs/api-live.log'
+
+# Search for specific error patterns
+ssh ustfccca-web4 'grep -i "error\|exception\|failed\|address already in use" /home/web4ustfccca/public_html/iz/xcri/logs/api-live.log | tail -20'
+```
+
 ### CRITICAL RULE #5: Flask /iz/shared/ Directory
 
 **Shared Directory is Required for All Flask Apps**:
