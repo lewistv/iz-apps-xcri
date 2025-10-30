@@ -103,7 +103,7 @@ async def get_team_knockout_rankings(
                 ko.team_size,
                 ko.athletes_with_xcri,
                 ko.team_five_xcri_pts,
-                ko.most_recent_race_date,
+                DATE_FORMAT(ko.most_recent_race_date, '%%Y-%%m-%%d') as most_recent_race_date,
                 ko.h2h_wins,
                 ko.h2h_losses,
                 ko.h2h_win_pct,
@@ -183,7 +183,7 @@ async def get_team_knockout_by_id(
                 ko.regl_finish, ko.conf_finish,
                 ko.knockout_rank, ko.team_five_rank, ko.elimination_method,
                 ko.team_size, ko.athletes_with_xcri, ko.team_five_xcri_pts,
-                ko.most_recent_race_date,
+                DATE_FORMAT(ko.most_recent_race_date, '%%Y-%%m-%%d') as most_recent_race_date,
                 ko.h2h_wins, ko.h2h_losses, ko.h2h_win_pct,
                 ko.checkpoint_date, ko.season_year, ko.calculation_date
             FROM iz_rankings_xcri_team_knockout ko
