@@ -28,15 +28,25 @@ This file provides guidance to Claude Code when working with the XCRI Rankings w
 **Analytics**: ✅ Google Analytics (G-FBG8Y8ZSTW) tracking enabled
 **Monitoring**: ✅ Real-time monitoring dashboard deployed
 
-**Recent Session (019)**: Frontend/Backend Bug Fixes and Refinements
+**Recent Session (020)**: Integration of izzypy_xcri Session 031 Database Improvements
+- ✅ Integrated 6 new database fields from izzypy_xcri Session 031
+- ✅ Backend: Added 3 fields to TeamKnockoutRanking (region, conference, most_recent_race_date)
+- ✅ Backend: Added 3 fields to TeamKnockoutMatchup (meet_id, team_a_ko_rank, team_b_ko_rank)
+- ✅ Frontend: Enabled server-side region/conference filtering
+- ✅ Frontend: Fixed Athletic.net links to use meet_id instead of race_hnd
+- ✅ Frontend: Added opponent knockout rank badges in matchup history
+- ✅ Critical bug fixes: Python format string escaping (`%%Y` for DATE_FORMAT in aiomysql)
+- ✅ Documentation: Comprehensive deployment procedures added to CLAUDE.md
+- ⚠️ **CRITICAL**: Documented catastrophic git operations failure and emergency recovery procedures
+- ⚠️ Region/Conference filtering requires populated data from izzypy_xcri (awaiting data)
+
+**Previous Session (019)**: Frontend/Backend Bug Fixes and Refinements
 - ✅ 11 of 13 user-reported issues resolved
 - ✅ Team Knockout table columns refined (renamed, removed, added)
 - ✅ Matchup history modal improvements (ordinal formatting, Athletic.net links)
 - ✅ H2H modal enhancements (season/gender subheader)
 - ✅ Documentation updates (FAQ anchors, cross-references, varsity definitions)
 - ✅ Historical snapshot "coming soon" banner
-- ⚠️ Region/Conference filtering awaiting izzypy_xcri data structure improvements
-- ⚠️ Athletic.net links need separate meet_id/race_id fields (izzypy_xcri)
 - 📄 Comprehensive requirements document created for backend team
 
 **Previous Session (018)**: Team Knockout Frontend UI Implementation
@@ -94,12 +104,12 @@ This file provides guidance to Claude Code when working with the XCRI Rankings w
 - ✅ Issue #10: Shared USTFCCCA header integration
 - ✅ Issue #6: Systemd service investigation (adopted manual startup)
 
-**Next Session (020)**: Additional refinements and izzypy_xcri response integration
-- Implement any additional frontend fixes discovered during testing
-- Integrate izzypy_xcri data structure improvements once available
-- Test region/conference filtering with populated data
-- Verify Athletic.net links with proper meet_id/race_id separation
-- Address any remaining UI/UX feedback
+**Next Session (021)**: Testing and refinements
+- Test region/conference filtering once data is populated by izzypy_xcri
+- Verify Athletic.net meet links work correctly with meet_id field
+- Monitor Team Knockout ranking stability with new fields
+- Address any user feedback on new features
+- Consider frontend UI improvements for region/conference filters
 
 ---
 
@@ -370,6 +380,304 @@ ssh ustfccca-web4 'chmod 755 /home/web4ustfccca/public_html/iz/xcri/api-proxy.cg
 2. **Backend only**: SSH to server, git pull, restart service
 3. **Both**: Do frontend rsync first, then backend git pull
 4. **Full deployment**: Use `./deployment/deploy.sh` which handles everything correctly
+
+---
+
+## 🚨 CRITICAL DEPLOYMENT PROCEDURES AND COMMON PITFALLS
+
+**⚠️ WARNING**: This section documents critical procedures based on catastrophic production failures. Read and follow these guidelines carefully to prevent complete production outages.
+
+### CRITICAL RULE #1: Never Use Git Operations on Production Server
+
+**❌ NEVER DO THIS**:
+```bash
+# DO NOT run git clean, git reset --hard, or any destructive git operations on production
+ssh ustfccca-web4 'cd /home/web4ustfccca/public_html/iz && git clean -fd'
+```
+
+**Why This Matters**:
+- Production server (`/home/web4ustfccca/public_html/iz/`) is **NOT a git repository**
+- Git operations can delete ALL application files (xc-scoreboard, season-resume, XCRI, shared/)
+- Results in immediate complete outage of all IZ applications
+- Requires manual file-by-file restoration via rsync
+
+**Session 020 Incident**: Git clean operation deleted all IZ application files, causing complete production outage requiring emergency restoration of 4+ applications.
+
+### CRITICAL RULE #2: Database Configuration Patterns
+
+**Flask Applications (.env Location)**:
+```bash
+# Flask apps use load_dotenv() which looks for .env in CURRENT WORKING DIRECTORY
+# Each Flask app needs its own .env file in its directory
+
+# CORRECT - Each app has its own .env:
+/home/web4ustfccca/public_html/iz/.env                    # Root IZ app
+/home/web4ustfccca/public_html/iz/xc-scoreboard/.env     # XC Scoreboard
+/home/web4ustfccca/public_html/iz/season-resume/.env     # Season Resume
+/home/web4ustfccca/public_html/iz/xcri/api/.env          # XCRI API
+
+# WRONG - Only parent .env exists:
+/home/web4ustfccca/public_html/iz/.env                    # Won't work for child apps!
+```
+
+**Database Host Configuration**:
+```env
+# CORRECT for all Flask apps and XCRI API:
+DATABASE_HOST=localhost
+WEB4_DB_HOST=localhost
+
+# WRONG - MySQL user permissions are host-specific:
+DATABASE_HOST=100-29-47-255.cprapid.com  # User web4ustfccca_public@localhost won't work!
+WEB4_DB_HOST=100-29-47-255.cprapid.com   # Access denied errors!
+```
+
+**Database Password** (NEVER use placeholders):
+```env
+# CORRECT:
+DATABASE_PASSWORD=39rDXrFP3e*f
+WEB4_DB_PASSWORD=39rDXrFP3e*f
+
+# WRONG - Will cause authentication failures:
+DATABASE_PASSWORD=[GET_FROM_ENV_FILE_AT_/Users/lewistv/Claude/.env.web4]
+```
+
+### CRITICAL RULE #3: Python Format String Escaping in SQL
+
+**aiomysql Requirement** - Double `%%` Escaping:
+```python
+# CORRECT - Double %% required for DATE_FORMAT in aiomysql:
+DATE_FORMAT(ko.most_recent_race_date, '%%Y-%%m-%%d') as most_recent_race_date
+
+# WRONG - Single % causes ValueError: unsupported format character 'Y':
+DATE_FORMAT(ko.most_recent_race_date, '%Y-%m-%d') as most_recent_race_date
+```
+
+**Why This Matters**:
+- aiomysql uses Python's `%` operator for parameter binding
+- Single `%` in SQL strings is interpreted as a Python format specifier BEFORE reaching MySQL
+- Error: `ValueError: unsupported format character 'Y' (0x59) at index 709`
+- Solution: Escape with `%%` so Python passes literal `%` to MySQL
+
+**Affected Files**: Any SQL queries with DATE_FORMAT, TIME_FORMAT, or other MySQL functions using `%` directives
+- `api/services/team_knockout_service.py` (lines 106-107, 186-187)
+- Any future service files using DATE/TIME formatting
+
+### CRITICAL RULE #4: API Process Restart After Code Changes
+
+**Always Restart API After Deploying Code**:
+```bash
+# Code changes don't take effect until API process reloads
+# API loads code into memory at startup, not on each request
+
+# REQUIRED after rsync deployment:
+ssh ustfccca-web4 'killall -9 python3.9 2>/dev/null && \
+  sleep 3 && \
+  cd /home/web4ustfccca/public_html/iz/xcri/api && \
+  find . -name "*.pyc" -delete 2>/dev/null && \
+  find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null && \
+  source venv/bin/activate && \
+  nohup uvicorn main:app --host 127.0.0.1 --port 8001 --workers 4 \
+    >> ../logs/api-live.log 2>&1 &'
+
+# Wait for workers to initialize (6-10 seconds)
+sleep 10
+
+# Verify 5 processes running (1 parent + 4 workers)
+ssh ustfccca-web4 'ps aux | grep "[p]ython3.9.*uvicorn" | wc -l'  # Should return 5
+
+# Test health endpoint
+curl https://web4.ustfccca.org/iz/xcri/api/health
+```
+
+**Why This Matters**:
+- Python bytecode cache (`.pyc` files) can serve old code
+- API process loads code at startup, not on each request
+- Symptoms: API serves old code despite correct files on server
+- Must kill process, clear cache, restart with fresh code
+
+### CRITICAL RULE #5: Flask /iz/shared/ Directory
+
+**Shared Directory is Required for All Flask Apps**:
+```bash
+# Flask apps (xc-scoreboard, season-resume, root /iz) import from shared/
+# Missing shared/ causes: ModuleNotFoundError: No module named 'shared.database'
+
+# Required structure:
+/home/web4ustfccca/public_html/iz/shared/
+  ├── database.py       # Database connection manager
+  ├── utils.py          # Shared utilities
+  ├── templates/        # Base templates
+  └── static/           # Shared assets
+
+# If shared/ is deleted, ALL Flask apps break immediately
+```
+
+**Session 020 Incident**: User identified missing `/iz/shared/` directory as root cause of Flask app failures after git clean operation.
+
+### CRITICAL RULE #6: Deployment Verification Checklist
+
+**After ANY Deployment, Verify All Services**:
+```bash
+# 1. Root IZ Landing Page
+curl -I https://web4.ustfccca.org/iz/ | grep "HTTP"  # Should be 200
+
+# 2. XC Scoreboard
+curl -I https://web4.ustfccca.org/iz/xc-scoreboard/ | grep "HTTP"  # Should be 200
+
+# 3. Season Resume
+curl -I https://web4.ustfccca.org/iz/season-resume/ | grep "HTTP"  # Should be 200
+
+# 4. XCRI Frontend
+curl -I https://web4.ustfccca.org/iz/xcri/ | grep "HTTP"  # Should be 200
+
+# 5. XCRI API
+curl https://web4.ustfccca.org/iz/xcri/api/health  # Should return JSON
+
+# 6. Verify API processes
+ssh ustfccca-web4 'ps aux | grep "[p]ython3.9.*uvicorn" | wc -l'  # Should be 5
+```
+
+**If ANY service returns non-200 or fails**:
+1. Check application-specific error logs
+2. Verify `.env` files exist in each app directory
+3. Verify database host is `localhost`
+4. Check `/iz/shared/` directory exists
+5. Clear Python bytecode cache
+6. Restart affected services
+
+### Common Deployment Errors and Solutions
+
+#### Error: "Access denied for user 'web4ustfccca_public'@'100-29-47-255.cprapid.com'"
+
+**Root Causes**:
+1. `.env` file missing from app directory (load_dotenv() looks in CWD)
+2. Database host configured as remote IP instead of localhost
+3. Database password is placeholder text
+
+**Solution**:
+```bash
+# Copy .env to app directory
+ssh ustfccca-web4 'cd /home/web4ustfccca/public_html/iz && cp .env xc-scoreboard/.env'
+
+# Change database host to localhost
+ssh ustfccca-web4 'sed -i "s|WEB4_DB_HOST=100-29-47-255.cprapid.com|WEB4_DB_HOST=localhost|" /home/web4ustfccca/public_html/iz/xc-scoreboard/.env'
+
+# Verify password is correct (not placeholder)
+ssh ustfccca-web4 'grep WEB4_DB_PASSWORD /home/web4ustfccca/public_html/iz/xc-scoreboard/.env'
+
+# Clear bytecode cache
+ssh ustfccca-web4 'find /home/web4ustfccca/public_html/iz/xc-scoreboard -name "*.pyc" -delete'
+```
+
+#### Error: "ModuleNotFoundError: No module named 'shared.database'"
+
+**Root Cause**: `/iz/shared/` directory missing or deleted
+
+**Solution**:
+```bash
+# Restore shared directory from local repository
+cd /Users/lewistv/code/ustfccca/iz-apps-clean
+rsync -avz --exclude='__pycache__' shared/ ustfccca-web4:/home/web4ustfccca/public_html/iz/shared/
+```
+
+#### Error: "ValueError: unsupported format character 'Y' (0x59)"
+
+**Root Cause**: SQL query has single `%` in DATE_FORMAT (should be `%%`)
+
+**Solution**:
+```python
+# Find the problematic query (usually in services/*.py)
+# Change single % to double %%:
+DATE_FORMAT(field_name, '%%Y-%%m-%%d')  # CORRECT
+
+# Deploy fix and restart API:
+rsync -avz api/services/ ustfccca-web4:/home/web4ustfccca/public_html/iz/xcri/api/services/
+# Then restart API (see CRITICAL RULE #4)
+```
+
+#### Error: API Serves Old Code After Deployment
+
+**Root Cause**: API process loaded old code into memory before fix was deployed
+
+**Solution**:
+```bash
+# Always restart API after deploying code changes
+# See CRITICAL RULE #4 for full restart procedure
+
+# Verify file on server is correct
+ssh ustfccca-web4 'grep "%%Y" /home/web4ustfccca/public_html/iz/xcri/api/services/team_knockout_service.py'
+
+# If file is correct but API still fails, kill and restart
+ssh ustfccca-web4 'killall -9 python3.9'
+# Wait 3 seconds, clear cache, restart (see full procedure in CRITICAL RULE #4)
+```
+
+### Emergency Recovery Procedures
+
+**Complete IZ Application Restoration** (if git operations delete everything):
+```bash
+# From local repository: /Users/lewistv/code/ustfccca/iz-apps-clean
+
+# 1. Restore shared directory
+rsync -avz --exclude='__pycache__' shared/ ustfccca-web4:/home/web4ustfccca/public_html/iz/shared/
+
+# 2. Restore XC Scoreboard
+rsync -avz --exclude='venv' --exclude='__pycache__' xc-scoreboard/ ustfccca-web4:/home/web4ustfccca/public_html/iz/xc-scoreboard/
+
+# 3. Restore Season Resume
+rsync -avz --exclude='venv' --exclude='__pycache__' season-resume/ ustfccca-web4:/home/web4ustfccca/public_html/iz/season-resume/
+
+# 4. Restore Root IZ Landing Page
+cd xcri  # Root IZ files are in xcri/ subdirectory
+rsync -avz index.py app-iz-main.cgi ustfccca-web4:/home/web4ustfccca/public_html/iz/
+ssh ustfccca-web4 'chmod 755 /home/web4ustfccca/public_html/iz/app-iz-main.cgi'
+
+# 5. Restore XCRI Frontend
+cd /Users/lewistv/code/ustfccca/iz-apps-clean/xcri
+rsync -avz frontend/dist/ ustfccca-web4:/home/web4ustfccca/public_html/iz/xcri/
+
+# 6. Restore XCRI API
+rsync -avz --exclude='venv' --exclude='__pycache__' api/ ustfccca-web4:/home/web4ustfccca/public_html/iz/xcri/api/
+
+# 7. Fix .env files (see Database Configuration above)
+ssh ustfccca-web4 'cd /home/web4ustfccca/public_html/iz && cp .env xc-scoreboard/.env && cp .env season-resume/.env'
+ssh ustfccca-web4 'sed -i "s|WEB4_DB_HOST=100-29-47-255.cprapid.com|WEB4_DB_HOST=localhost|" /home/web4ustfccca/public_html/iz/.env /home/web4ustfccca/public_html/iz/xc-scoreboard/.env /home/web4ustfccca/public_html/iz/season-resume/.env'
+
+# 8. Verify database password in XCRI API .env
+ssh ustfccca-web4 'grep DATABASE_PASSWORD /home/web4ustfccca/public_html/iz/xcri/api/.env'
+# If placeholder, replace with actual: 39rDXrFP3e*f
+
+# 9. Clear all bytecode cache
+ssh ustfccca-web4 'find /home/web4ustfccca/public_html/iz -name "*.pyc" -delete'
+
+# 10. Restart XCRI API
+# (See CRITICAL RULE #4)
+
+# 11. Verify all services (See CRITICAL RULE #6)
+```
+
+### Safe Deployment Practices
+
+**DO**:
+- Use rsync WITHOUT `--delete` flag for frontend deployments
+- Always verify files on server after rsync
+- Always restart API after backend code changes
+- Always clear Python bytecode cache before restart
+- Always verify all services after deployment
+- Keep local repository as source of truth
+- Use `.env` files in each app's working directory
+- Set database host to `localhost` for all apps
+- Test in development before deploying to production
+
+**DON'T**:
+- Use git operations on production server
+- Use `--delete` flag with rsync to production
+- Deploy without restarting affected services
+- Forget to clear `.pyc` files
+- Use placeholder text in .env files
+- Configure database host as remote IP
+- Skip deployment verification steps
+- Deploy untested code to production
 
 ---
 
@@ -703,6 +1011,21 @@ tail -50 /home/web4ustfccca/iz/xcri/logs/api-error.log
 - Frontend: TeamProfile displays season resume HTML
 - Status: **Feature enhancements complete - 76% completion rate**
 
+**Session 020** (October 29, 2025):
+- ✅ Integration of 6 new database fields from izzypy_xcri Session 031
+- UPDATED: api/models.py - 6 new Pydantic fields (3 for rankings, 3 for matchups)
+- UPDATED: api/services/team_knockout_service.py - SQL queries with new fields
+- CRITICAL FIX: Python format string escaping (`%%Y` for DATE_FORMAT in aiomysql)
+- UPDATED: frontend/src/App.jsx - Server-side region/conference filtering
+- UPDATED: frontend/src/components/MatchupHistoryModal.jsx - meet_id links, ko_rank badges
+- UPDATED: frontend/src/components/MatchupHistoryModal.css - ko-rank-badge styling
+- ⚠️ **CATASTROPHIC FAILURE**: Git operations deleted all IZ applications
+- ✅ Emergency restoration: xc-scoreboard, season-resume, XCRI, shared/, root /iz
+- ✅ Database configuration fixes: .env files, localhost host, correct password
+- ✅ Python bytecode cache clearing procedures implemented
+- ✅ Comprehensive deployment documentation added to CLAUDE.md
+- Status: **All systems operational, critical procedures documented**
+
 **Session 015** (October 29, 2025):
 - ✅ Team Knockout matchup API implementation (backend complete)
 - NEW: api/services/team_knockout_service.py - 7 async service functions (680 lines)
@@ -715,8 +1038,6 @@ tail -50 /home/web4ustfccca/iz/xcri/logs/api-error.log
 - Deployment: Files on server, restart pending (Session 016)
 - Frontend UI: Deferred to future session (extensive component work required)
 - Status: **Backend API complete, deployment verification needed**
-
-**Next Session (016)**: Server maintenance mode, API restart, agent creation
 
 ---
 
@@ -816,7 +1137,7 @@ For questions about this webapp or deployment issues, refer to:
 
 ---
 
-**Last Updated**: October 21, 2025
+**Last Updated**: October 29, 2025
 **Migration Status**: Complete and deployed
 **Deployment Status**: ✅ Operational
-**Next Step**: Cosmetic and practical fixes
+**Session 020**: Integration complete with critical deployment documentation added
