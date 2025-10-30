@@ -104,6 +104,14 @@ async def list_team_knockout_rankings(
         default=None,
         description="Search by team name",
         min_length=2
+    ),
+    region: Optional[str] = Query(
+        default=None,
+        description="Filter by region name"
+    ),
+    conference: Optional[str] = Query(
+        default=None,
+        description="Filter by conference name"
     )
 ):
     """List Team Knockout rankings with filters and pagination"""
@@ -116,7 +124,9 @@ async def list_team_knockout_rankings(
             checkpoint_date=checkpoint_date,
             limit=limit,
             offset=offset,
-            search=search
+            search=search,
+            region=region,              # Session 021: Add region filtering
+            conference=conference        # Session 021: Add conference filtering
         )
 
         return {

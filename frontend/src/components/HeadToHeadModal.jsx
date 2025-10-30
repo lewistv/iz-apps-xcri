@@ -66,9 +66,10 @@ export default function HeadToHeadModal({
   };
 
   // Get win percentage for a team
+  // Session 021: Changed from percentage (100.0%) to decimal format (1.000)
   const getWinPct = (wins, totalMatchups) => {
-    if (totalMatchups === 0) return 0;
-    return ((wins / totalMatchups) * 100).toFixed(1);
+    if (totalMatchups === 0) return '.000';
+    return (wins / totalMatchups).toFixed(3);
   };
 
   return (
@@ -119,7 +120,7 @@ export default function HeadToHeadModal({
                     </div>
                     {h2hData.total_matchups > 0 && (
                       <div className="stat-pct">
-                        ({getWinPct(h2hData.team_a_wins, h2hData.total_matchups)}%)
+                        ({getWinPct(h2hData.team_a_wins, h2hData.total_matchups)})
                       </div>
                     )}
                   </div>
@@ -139,7 +140,7 @@ export default function HeadToHeadModal({
                     </div>
                     {h2hData.total_matchups > 0 && (
                       <div className="stat-pct">
-                        ({getWinPct(h2hData.team_b_wins, h2hData.total_matchups)}%)
+                        ({getWinPct(h2hData.team_b_wins, h2hData.total_matchups)})
                       </div>
                     )}
                   </div>

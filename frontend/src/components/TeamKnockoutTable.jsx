@@ -53,13 +53,14 @@ export default function TeamKnockoutTable({
 
   /**
    * Format win-loss record as "W-L (Win%)"
+   * Session 021: Changed from percentage (100.0%) to decimal format (1.000)
    */
   const formatRecord = (wins, losses) => {
     const totalGames = wins + losses;
-    if (totalGames === 0) return '0-0 (0.0%)';
+    if (totalGames === 0) return '0-0 (.000)';
 
-    const winPct = ((wins / totalGames) * 100).toFixed(1);
-    return `${wins}-${losses} (${winPct}%)`;
+    const winPct = (wins / totalGames).toFixed(3);
+    return `${wins}-${losses} (${winPct})`;
   };
 
   /**

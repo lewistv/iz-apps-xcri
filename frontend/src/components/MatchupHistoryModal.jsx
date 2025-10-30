@@ -43,6 +43,9 @@ export default function MatchupHistoryModal({
           team.team_id || team.anet_team_hnd,
           {
             season_year: seasonYear,
+            rank_group_type: team.rank_group_type || 'D',  // Session 021: Filter by ranking type
+            rank_group_fk: team.rank_group_fk,             // Session 021: Filter by division
+            gender_code: team.gender_code,                 // Session 021: Filter by gender (fixes Iowa State men showing women's matchups)
             limit,
             offset
           }
@@ -177,7 +180,7 @@ export default function MatchupHistoryModal({
                 <div className="summary-card">
                   <div className="summary-label">Win Percentage</div>
                   <div className="summary-value">
-                    {matchupData.stats.win_pct?.toFixed(1) || '0.0'}%
+                    {(matchupData.stats.win_pct / 100)?.toFixed(3) || '.000'}
                   </div>
                 </div>
                 <div className="summary-card">

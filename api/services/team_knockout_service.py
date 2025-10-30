@@ -28,7 +28,9 @@ async def get_team_knockout_rankings(
     checkpoint_date: Optional[str] = None,
     limit: int = 100,
     offset: int = 0,
-    search: Optional[str] = None
+    search: Optional[str] = None,
+    region: Optional[str] = None,          # Session 021: Add region filtering
+    conference: Optional[str] = None        # Session 021: Add conference filtering
 ) -> Tuple[List[Dict[str, Any]], int]:
     """
     Get Team Knockout rankings with filters and pagination.
@@ -42,6 +44,8 @@ async def get_team_knockout_rankings(
         limit: Results per page (default: 100)
         offset: Pagination offset (default: 0)
         search: Search by team name (optional)
+        region: Filter by region name (optional)
+        conference: Filter by conference name (optional)
 
     Returns:
         Tuple of (results: List[Dict], total_count: int)
@@ -68,6 +72,15 @@ async def get_team_knockout_rankings(
         if search:
             where_clauses.append("ko.team_name LIKE %s")
             params.append(f"%{search}%")
+
+        # Session 021: Add region and conference filtering
+        if region:
+            where_clauses.append("ko.regl_group_name = %s")
+            params.append(region)
+
+        if conference:
+            where_clauses.append("ko.conf_group_name = %s")
+            params.append(conference)
 
         where_sql = " AND ".join(where_clauses)
 
