@@ -239,20 +239,7 @@ export default function MatchupHistoryModal({
                             </td>
                             <td className="opponent-cell">
                               {opponentKORank && <span className="ko-rank-badge" title="Team Knockout rank">#{opponentKORank}</span>}
-                              {onOpponentClick ? (
-                                <button
-                                  className="opponent-link"
-                                  onClick={() => onOpponentClick(team, {
-                                    team_id: matchup.team_a_name === team.team_name ? matchup.team_b_id : matchup.team_a_id,
-                                    team_name: opponentName
-                                  })}
-                                  title="View head-to-head comparison"
-                                >
-                                  {opponentName}
-                                </button>
-                              ) : (
-                                opponentName
-                              )}
+                              {opponentName}
                             </td>
                             <td className="rank-cell text-center">
                               {formatOrdinal(opponentRank)}
