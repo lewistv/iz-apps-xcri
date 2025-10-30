@@ -859,12 +859,28 @@ ssh ustfccca-web4 'ps aux | grep "[p]ython3.9"'
 ssh ustfccca-web4 'ps aux | grep "[p]ython3.9" | wc -l'
 ```
 
-### Manual Restart Procedure
+### API Restart Procedure
 
-**For detailed instructions**, see `docs/operations/API_RESTART_GUIDE.md`
+**RECOMMENDED**: Use the automated restart script with maintenance mode:
 
 ```bash
-# Quick restart (use with caution - no maintenance mode)
+# Production-ready restart with maintenance mode (RECOMMENDED)
+cd /Users/lewistv/code/ustfccca/iz-apps-clean/xcri
+./deployment/restart-api-with-maintenance.sh
+```
+
+**Features of restart-api-with-maintenance.sh**:
+- Displays beautiful maintenance page to users during update
+- Kills all Python processes and clears bytecode cache
+- Starts API with 4 workers
+- Verifies health and process count before restoring service
+- Tests matchups endpoint to confirm fix deployment
+- Comprehensive error handling and rollback
+
+**Manual Restart** (for emergency use only, no maintenance mode):
+
+```bash
+# Quick restart (use with caution - no user-facing maintenance page)
 ssh ustfccca-web4 'ps aux | grep "web4ust.*python3.9" | grep -v grep | awk "{print \$2}" | xargs kill -9 2>/dev/null && \
   sleep 3 && \
   cd /home/web4ustfccca/public_html/iz/xcri/api && \
