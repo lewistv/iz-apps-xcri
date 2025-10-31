@@ -28,7 +28,18 @@ This file provides guidance to Claude Code when working with the XCRI Rankings w
 **Analytics**: ✅ Google Analytics (G-FBG8Y8ZSTW) tracking enabled
 **Monitoring**: ✅ Real-time monitoring dashboard deployed
 
-**Recent Session (020)**: Integration of izzypy_xcri Session 031 Database Improvements
+**Recent Session (021 Extended)**: Matchups Bug Fix and Production Tooling
+- ✅ Fixed critical "No matchups found" bug in Season Varsity Matchups modal
+- ✅ Backend: Fixed SQL parameter mismatch in team_knockout_service.py:343
+- ✅ Frontend: Changed win percentage format from "100.0%" to "1.000" (decimal)
+- ✅ Frontend: Removed premature H2H opponent click-through links
+- ✅ Deployment: Created production-ready restart script with maintenance mode
+- ✅ Deployment: Documented API restart best practices (kill zombies, clear cache)
+- ✅ Documentation: Updated CLAUDE.md to recommend maintenance mode restart script
+- ✅ GitHub Issue #24: Matchups endpoint bug closed (SQL parameter fix deployed)
+- 📊 Verified: 152 matchups with opponent KO ranks loading correctly
+
+**Previous Session (020)**: Integration of izzypy_xcri Session 031 Database Improvements
 - ✅ Integrated 6 new database fields from izzypy_xcri Session 031
 - ✅ Backend: Added 3 fields to TeamKnockoutRanking (region, conference, most_recent_race_date)
 - ✅ Backend: Added 3 fields to TeamKnockoutMatchup (meet_id, team_a_ko_rank, team_b_ko_rank)
@@ -104,12 +115,13 @@ This file provides guidance to Claude Code when working with the XCRI Rankings w
 - ✅ Issue #10: Shared USTFCCCA header integration
 - ✅ Issue #6: Systemd service investigation (adopted manual startup)
 
-**Next Session (021)**: Testing and refinements
+**Next Session (022)**: New Features and Enhancements
+- Review user feedback and prioritize new feature requests
+- Consider H2H modal refinements (currently disabled due to UX issues)
+- Explore additional data visualizations or analytics features
 - Test region/conference filtering once data is populated by izzypy_xcri
-- Verify Athletic.net meet links work correctly with meet_id field
-- Monitor Team Knockout ranking stability with new fields
-- Address any user feedback on new features
-- Consider frontend UI improvements for region/conference filters
+- Monitor Team Knockout ranking stability with new database fields
+- Consider performance optimizations or UI enhancements
 
 ---
 
